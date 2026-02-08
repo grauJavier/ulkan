@@ -1,0 +1,29 @@
+---
+description: Protocol for bug fixes (Reproduction -> Fix -> Docs)
+trigger: "Fix bug"
+---
+# Bug Fix Workflow
+
+## Trigger
+Use when resolving a reported bug or issue.
+
+## Steps
+
+1.  **Reproduction**
+    *   Create a test case that reproduces the failure.
+    *   Analyze logs and behavior.
+
+2.  **Capabilities Check**
+    *   **Skill Check**: Is there a debugging skill in `.agent/skills/`?
+    *   **Tool Check**: Do I need a specific Tool to debug this? (If yes, use `tools-creator`).
+
+3.  **Fix**
+    *   Implement the fix.
+    *   Ensure the test passes.
+
+4.  **Verification**
+    *   Run full test suite to ensure no regressions.
+
+5.  **Docs Check**
+    *   Was the bug due to a missing or unclear guideline? -> Use `guidelines-creator`.
+    *   Does the fix change behavior described in a Spec? -> Update the Spec.
