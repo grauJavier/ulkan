@@ -38,6 +38,58 @@ ULKAN_STYLE = get_style(
     style_override=False,
 )
 
+
+def _prompt_for_agents() -> list[str]:
+    """Prompts user to select agents with checkboxes."""
+    agent_choices = [
+        {
+            "name": "Claude Code",
+            "value": "claude",
+            "enabled": is_cli_available("claude"),
+        },
+        {
+            "name": "Gemini CLI",
+            "value": "gemini",
+            "enabled": is_cli_available("gemini"),
+        },
+        {
+            "name": "Codex (OpenAI)",
+            "value": "codex",
+            "enabled": is_cli_available("codex"),
+        },
+        {
+            "name": "GitHub Copilot",
+            "value": "copilot",
+            "enabled": is_cli_available("copilot"),
+        },
+        {
+            "name": "OpenCode",
+            "value": "opencode",
+            "enabled": is_cli_available("opencode"),
+        },
+    ]
+    selected_agents = inquirer.checkbox(
+        message="Select AI agents to adapt for:",
+        choices=agent_choices,
+        instruction="(↑↓ move, Space select, Enter confirm)",
+        style=ULKAN_STYLE,
+    ).execute()
+
+    # Show formatted selection summary
+    if selected_agents:
+        agent_names = {
+            "claude": "Claude",
+            "gemini": "Gemini",
+            "codex": "Codex",
+            "copilot": "Copilot",
+            "opencode": "OpenCode",
+        }
+        names = [agent_names[a] for a in selected_agents]
+        console.print(f"[info]✓ Selected: {', '.join(names)}[/info]")
+
+    return selected_agents
+
+
 app = typer.Typer(
     help="[bold #5f5fff]Ulkan[/bold #5f5fff] [white]|[/white] [dim cyan]The Agentic Scaffolding Tool[/dim cyan]",
     no_args_is_help=True,
@@ -45,8 +97,25 @@ app = typer.Typer(
 )
 
 
+def version_callback(value: bool):
+    if value:
+        from . import __version__
+
+        console.print(f"{__version__}", highlight=False)
+        raise typer.Exit()
+
+
 @app.callback()
-def main() -> None:
+def main(
+    version: bool = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Show the application's version and exit.",
+        callback=version_callback,
+        is_eager=True,
+    ),
+) -> None:
     """
     Ulkan CLI
     """
@@ -66,7 +135,9 @@ def init(
     """
     Scaffolds a new agentic project structure.
     """
-    print_banner()
+    from . import __version__
+
+    print_banner(version=__version__)
 
     target_path = path.resolve()
 
@@ -88,51 +159,7 @@ def init(
     selected_agents: list[str] = []
     if not force:
         console.print()
-        agent_choices = [
-            {
-                "name": "Claude Code",
-                "value": "claude",
-                "enabled": is_cli_available("claude"),
-            },
-            {
-                "name": "Gemini CLI",
-                "value": "gemini",
-                "enabled": is_cli_available("gemini"),
-            },
-            {
-                "name": "Codex (OpenAI)",
-                "value": "codex",
-                "enabled": is_cli_available("codex"),
-            },
-            {
-                "name": "GitHub Copilot",
-                "value": "copilot",
-                "enabled": is_cli_available("copilot"),
-            },
-            {
-                "name": "OpenCode",
-                "value": "opencode",
-                "enabled": is_cli_available("opencode"),
-            },
-        ]
-        selected_agents = inquirer.checkbox(
-            message="Select AI agents to adapt for:",
-            choices=agent_choices,
-            instruction="(↑↓ move, Space select, Enter confirm)",
-            style=ULKAN_STYLE,
-        ).execute()
-
-        # Show formatted selection summary
-        if selected_agents:
-            agent_names = {
-                "claude": "Claude",
-                "gemini": "Gemini",
-                "codex": "Codex",
-                "copilot": "Copilot",
-                "opencode": "OpenCode",
-            }
-            names = [agent_names[a] for a in selected_agents]
-            console.print(f"[info]✓ Selected: {', '.join(names)}[/info]")
+        selected_agents = _prompt_for_agents()
         console.print()
 
     print_step("Initializing project...")
@@ -259,7 +286,9 @@ def adapt(
     """
     Adapts the project for specific AI agents (Claude, Gemini, etc.).
     """
-    print_banner()
+    from . import __version__
+
+    print_banner(version=__version__)
     root = Path.cwd()
 
     if not (root / "AGENTS.md").exists():
@@ -271,21 +300,19 @@ def adapt(
     # If no flags are provided, run in interactive mode
     if not any([all, claude, gemini, codex, copilot, opencode]):
         console.print("[title]Which AI assistants do you use?[/title]")
+        console.print()
 
-        # Interactive selection
-        if Confirm.ask("Configure Claude Code?", default=True):
+        selected_agents = _prompt_for_agents()
+
+        if "claude" in selected_agents:
             claude = True
-
-        if Confirm.ask("Configure Gemini CLI?", default=False):
+        if "gemini" in selected_agents:
             gemini = True
-
-        if Confirm.ask("Configure Codex (OpenAI)?", default=False):
+        if "codex" in selected_agents:
             codex = True
-
-        if Confirm.ask("Configure GitHub Copilot?", default=False):
+        if "copilot" in selected_agents:
             copilot = True
-
-        if Confirm.ask("Configure OpenCode?", default=False):
+        if "opencode" in selected_agents:
             opencode = True
 
     # If "all" is selected, enable all
@@ -340,7 +367,9 @@ def build(
     Detects which agents are adapted (via symlinks) and uses their CLI
     to analyze the project and update AGENTS.md.
     """
-    print_banner()
+    from . import __version__
+
+    print_banner(version=__version__)
 
     target_path = path.resolve()
 
@@ -399,7 +428,7 @@ def remove(
     from .agents import AGENT_FILE_MAP
     from .builder import get_adapted_agents
 
-    print_banner()
+    print_banner(version=__version__)
     root = Path.cwd()
 
     # Case 1: Eject Ulkan (--self)
@@ -522,7 +551,9 @@ def autoremove(
     """
     from .builder import get_adapted_agents
 
-    print_banner()
+    from . import __version__
+
+    print_banner(version=__version__)
     root = Path.cwd()
 
     # Find adapted agents without CLI installed
@@ -572,7 +603,9 @@ def migrate(
     from .generator import generate_project
     from .migrator import detect_sources, run_migration
 
-    print_banner()
+    from . import __version__
+
+    print_banner(version=__version__)
     root = Path.cwd()
 
     # Check if .agent already exists

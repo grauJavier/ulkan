@@ -27,7 +27,7 @@ custom_theme = Theme(
 console = Console(theme=custom_theme)
 
 
-def print_banner():
+def print_banner(version: str = None):
     """Prints the Ulkan banner in ASCII art."""
     # "ansi_shadow" or "doom" are good for shadow/filled look.
     # If ansi_shadow isn't available, pyfiglet might fall back or error,
@@ -60,7 +60,11 @@ def print_banner():
         color = gradient_colors[min(i, len(gradient_colors) - 1)]
         console.print(f"[bold {color}]{line}[/bold {color}]", justify="center")
 
-    console.print("[dim cyan]The Agentic Scaffolding Tool[/dim cyan]", justify="center")
+    subtitle = "[dim cyan]The Agentic Scaffolding Tool[/dim cyan]"
+    if version:
+        subtitle += f" [dim cyan]- v{version}[/dim cyan]"
+
+    console.print(subtitle, justify="center", highlight=False)
     console.print()
 
 
