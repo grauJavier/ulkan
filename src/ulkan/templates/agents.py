@@ -6,6 +6,8 @@ AGENTS_MD_TEMPLATE = """# 🤖 Project Agent Guide (AGENTS.md)
 
 **Mission**: This file is the definitive guide for any AI Agent working on this project. It defines the Operating Protocol, Available Skills, and Workflows to ensure consistency and high-quality output.
 
+**📘 NEED HELP?** See the [Operator's Manual](.agent/docs/ULKAN_MANUAL.md) for detailed instructions on using Ulkan.
+
 ## 1. Operating Protocol
 
 When you start a task, follow this **Search Order**:

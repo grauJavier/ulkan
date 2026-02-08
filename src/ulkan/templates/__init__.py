@@ -11,6 +11,7 @@ This package contains all file templates organized by category:
 
 # Root manifest
 from .agents import AGENTS_MD_TEMPLATE
+from .manual import MANUAL_TEMPLATE_MD
 
 # READMEs
 from .readme import (
@@ -73,6 +74,7 @@ from .workflows import (
 __all__ = [
     # Root
     "AGENTS_MD_TEMPLATE",
+    "MANUAL_TEMPLATE_MD",
     # READMEs
     "SKILLS_README_TEMPLATE",
     "TOOLS_README_TEMPLATE",

@@ -17,7 +17,9 @@ from .templates import (  # noqa: F401 - templates is now a package
     # Guidelines Creator
     GUIDELINES_CREATOR_SKILL_MD,
     GUIDELINES_README_TEMPLATE,
+    GUIDELINES_README_TEMPLATE,
     LINT_AGENT_SETUP_PY,
+    MANUAL_TEMPLATE_MD,
     MIGRATE_WORKFLOW,
     # Product Docs Creator
     PRODUCT_DOCS_CREATOR_SKILL_MD,
@@ -80,6 +82,13 @@ def write_file(path: Path, content: str, base_path: Path | None = None) -> bool:
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+
+    # Show success message for created files
+    if base_path:
+        display_path = path.relative_to(base_path)
+    else:
+        display_path = f"{path.parent.name}/{path.name}"
+    console.print(f"[title]  ✔ Created: {display_path}[/title]")
     return True
 
 
@@ -143,6 +152,9 @@ def generate_project(base_path: Path) -> None:
     create_directory(agent_dir / "docs" / "guidelines")
     create_directory(agent_dir / "docs" / "specs")
     create_directory(agent_dir / "docs" / "decisions")
+
+    # 3. Manual
+    write_file(agent_dir / "docs" / "ULKAN_MANUAL.md", MANUAL_TEMPLATE_MD)
 
     # 3. READMEs
     write_file(agent_dir / "skills" / "README.md", SKILLS_README_TEMPLATE)
