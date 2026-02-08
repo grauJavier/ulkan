@@ -221,7 +221,7 @@ def generate_project(base_path: Path) -> None:
     write_file(agent_dir / "workflows" / "fix.md", BUG_FIX_WORKFLOW)
     write_file(agent_dir / "workflows" / "docs.md", DOCUMENTATION_CHECK_WORKFLOW)
     write_file(agent_dir / "workflows" / "build.md", PRODUCT_INCEPTION_WORKFLOW)
-    write_file(agent_dir / "workflows" / "refactor.md", REFACTORING_WORKFLOW)
+    write_file(agent_dir / "workflows" / "refact.md", REFACTORING_WORKFLOW)
     write_file(agent_dir / "workflows" / "migrate.md", MIGRATE_WORKFLOW)
 
     # 13. Scripts

@@ -57,7 +57,7 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 | `/build` | "New app", "From scratch" | Discovery -> Vision -> Architecture. |
 | `/feat` | "New feature" | Spec -> Plan -> Code -> Verification. |
 | `/fix` | "Fix bug" | Repro -> Fix -> Verify -> Docs Update. |
-| `/refactor` | "Refactor code" | Safety Check (Tests) -> Atomic Changes. |
+| `/refact` | "Refactor code" | Safety Check (Tests) -> Atomic Changes. |
 | `/docs` | "Check docs", "Maintenance" | Ensure consistency across all docs. |
 | `/migrate` | "Migrate project" | Migrate existing agent configs to Ulkan. |
 
@@ -864,8 +864,13 @@ Use when starting a new feature or significant enhancement.
 
 5.  **Docs Check (Crucial)**
     *   Does this change affect `ARCHITECTURE.md`? -> Update it.
-    *   Did we make a significant tech decision? -> Use `adr-creator`.
     *   Did we follow all rules? -> Check `.agent/rules/`.
+
+869: 6.  **Definition of Done**
+    *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]`.
+    *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure code style.
+    *   **Tests**: Verify all tests pass.
+    *   **Docs**: Run the `/docs` workflow to lint and sync documentation.
 """
 
 BUG_FIX_WORKFLOW = """---
@@ -895,8 +900,13 @@ Use when resolving a reported bug or issue.
     *   Run full test suite to ensure no regressions.
 
 5.  **Docs Check**
-    *   Was the bug due to a missing or unclear guideline? -> Use `guidelines-creator`.
     *   Does the fix change behavior described in a Spec? -> Update the Spec.
+
+900: 6.  **Definition of Done**
+    *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]` with the prefix `Fix:`.
+    *   **Linting**: Run `uv run ruff check` and `uv run black .`.
+    *   **Tests**: Affirm that the regression test passes and no other tests are broken.
+    *   **Docs**: Run the `/docs` workflow to lint and sync documentation.
 """
 
 DOCUMENTATION_CHECK_WORKFLOW = """---
@@ -963,13 +973,14 @@ Use when the user wants to start a "new app", "new project", or "from scratch".
 5.  **Validation**
     *   Present the Vision and Architecture to the user.
     *   Ask: "Does this match your intent?"
+    *   **Docs**: Run the `/docs` workflow to lint and sync documentation.
 """
 
 REFACTORING_WORKFLOW = """---
 description: Workflow for code refactoring (Test Baseline -> Refactor -> Verify)
 trigger: "Refactor code"
 ---
-# Refactoring Workflow
+# Refactoring Workflow (/refact)
 
 ## Trigger
 Use when improving code structure, readability, or performance WITHOUT changing external behavior.
@@ -994,8 +1005,13 @@ Use when improving code structure, readability, or performance WITHOUT changing 
     *   If tests fail, revert immediately to the last green state.
 
 5.  **Docs Check**
-    *   Did the refactor change any public API or Interface? -> Update `specs/`.
     *   Did we introduce a new pattern? -> Update `.agent/docs/guidelines/`.
+
+999: 6.  **Definition of Done**
+    *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure the refactor didn't break style.
+    *   **Tests**: Verify all tests pass (GREEN).
+    *   **CHANGELOG**: (Optional) If the refactor is significant, note it in `CHANGELOG.md` under `Changed`.
+    *   **Docs**: Run the `/docs` workflow to lint and sync documentation.
 """
 
 # =============================================================================

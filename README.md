@@ -59,9 +59,14 @@ Interactive mode prompts for agent selection:
   ○ GitHub Copilot
 ```
 
+Use `--gitignore` to automatically ignore agent configuration:
+```bash
+ulkan init --gitignore
+```
+
 Or use `-y` for non-interactive mode:
 ```bash
-ulkan init -y
+ulkan init -y --gitignore
 ```
 
 Creates:
@@ -131,7 +136,7 @@ ulkan autoremove       # Removes symlinks for agents without CLI installed
 | `/build` | New project | Discovery → Vision → Architecture |
 | `/feat` | New feature | Spec → Plan → Code → Docs |
 | `/fix` | Fix bug | Repro → Fix → Verify |
-| `/refactor` | Refactor | Test baseline → Atomic changes |
+| `/refact` | Refactor | Test baseline → Atomic changes |
 | `/docs` | Maintenance | Sync and validate docs |
 | `/migrate` | Migrate project | Adopt Ulkan in existing projects |
 

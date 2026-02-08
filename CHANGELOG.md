@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+
+### Added
+- `--gitignore` flag to `ulkan init` to automatically add `.agent/` and `AGENTS.md` to `.gitignore`.
+
+### Changed
+- Renamed `/refactor` workflow to `/refact` for brevity.
+
 ## [0.1.0] - 2026-02-08
 
 ### Added

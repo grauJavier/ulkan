@@ -1,8 +1,8 @@
 ---
 description: Workflow for code refactoring (Test Baseline -> Refactor -> Verify)
-trigger: "Refactor code"
 ---
-# Refactoring Workflow
+
+# Refactoring Workflow (/refact)
 
 ## Trigger
 Use when improving code structure, readability, or performance WITHOUT changing external behavior.
@@ -34,3 +34,4 @@ Use when improving code structure, readability, or performance WITHOUT changing 
     *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure the refactor didn't break style.
     *   **Tests**: Verify all tests pass (GREEN).
     *   **CHANGELOG**: (Optional) If the refactor is significant, note it in `CHANGELOG.md` under `Changed`.
+    *   **Docs**: Run the `/docs` workflow to lint and sync documentation.

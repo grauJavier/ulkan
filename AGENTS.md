@@ -52,7 +52,7 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 | `/feat` | \"New feature\" | Guide for new features (Spec -> Plan -> Code -> Docs) |
 | `/fix` | \"Fix bug\" | Protocol for bug fixes (Reproduction -> Fix -> Docs) |
 | `/migrate` | \"Migrate project\" | Migrate existing agent configs to Ulkan structure |
-| `/refactor` | \"Refactor code\" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
+| `/refact` | \"Refactor code\" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
 
 ---
 
