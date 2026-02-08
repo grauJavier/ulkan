@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ulkan list <type>` command to view registry assets (supports `all` to see everything).
 - `ulkan add <type> <name>` command to add individual assets to the project.
 - File-based Registry system replacing hardcoded templates.
+- **New Workflows**:
+  - `git-flow`: Standard Gitflow (main/dev) with Conventional Commits.
+  - `add-to-workflow`: AI-powered workflow optimizer/injector.
+- **CLI Enhancements**: `ulkan add` now provides "Recommended Next Steps" and workflow ProTips.
 
 ### Changed
 - Renamed `/refactor` workflow to `/refact` for brevity.

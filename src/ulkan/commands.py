@@ -771,9 +771,17 @@ def add(
 
     if success:
         print_success(f"Added {asset_type} '{name}' successfully! 🚀")
+        console.print()
+        console.print("[title]Recommended Next Steps:[/title]")
         console.print(
-            "[info]Run [prompt]ulkan sync[/prompt] to update documentation.[/info]"
+            "  [info]1.[/info] Run [prompt]ulkan sync[/prompt] to update documentation."
         )
+        if asset_type == "workflow":
+            console.print(
+                f"  [info]2.[/info] [dim]ProTip: Update this workflow with specific steps:[/dim]"
+            )
+            console.print(f'     [dim]"/add-to-workflow {name} <instruction>"[/dim]')
+        console.print()
     else:
         raise typer.Exit(code=1)
 

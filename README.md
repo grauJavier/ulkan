@@ -161,6 +161,8 @@ ulkan add tool scripts/my-script.py # Adds .agent/tools/scripts/my-script.py
 | `/refact` | Refactor | Test baseline → Atomic changes |
 | `/docs` | Maintenance | Sync and validate docs |
 | `/migrate` | Migrate project | Adopt Ulkan in existing projects |
+| `/git-flow` | Manage branches | Standard Gitflow with Conventional Commits |
+| `/add-to-workflow` | Enhance workflow | Intelligently add steps/rules to workflows |
 
 ## 🏗️ Why Ulkan?
 

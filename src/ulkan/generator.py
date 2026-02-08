@@ -188,6 +188,7 @@ def generate_project(base_path: Path) -> None:
         "build.md": "build.md",
         "refact.md": "refact.md",
         "migrate.md": "migrate.md",
+        "add-to-workflow.md": "add-to-workflow.md",
     }
 
     for src_file, dest_file in workflows_to_install.items():
