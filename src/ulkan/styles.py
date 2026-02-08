@@ -1,9 +1,6 @@
 import pyfiglet
 from rich.console import Console
 from rich.theme import Theme
-from rich.style import Style
-from rich.text import Text
-import random
 
 # Palette:
 # - Spiritual Blue: #5f5fff

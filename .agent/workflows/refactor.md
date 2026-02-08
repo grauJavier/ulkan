@@ -29,3 +29,8 @@ Use when improving code structure, readability, or performance WITHOUT changing 
 5.  **Docs Check**
     *   Did the refactor change any public API or Interface? -> Update `specs/`.
     *   Did we introduce a new pattern? -> Update `.agent/docs/guidelines/`.
+
+6.  **Definition of Done**
+    *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure the refactor didn't break style.
+    *   **Tests**: Verify all tests pass (GREEN).
+    *   **CHANGELOG**: (Optional) If the refactor is significant, note it in `CHANGELOG.md` under `Changed`.

@@ -27,7 +27,12 @@ Use when starting a new feature or significant enhancement.
     *   Implement the code.
     *   Follow `.agent/docs/guidelines/`.
 
-5.  **Docs Check (Crucial)**
+3.  **Docs Check (Crucial)**
     *   Does this change affect `ARCHITECTURE.md`? -> Update it.
     *   Did we make a significant tech decision? -> Use `adr-creator`.
     *   Did we follow all rules? -> Check `.agent/rules/`.
+
+6.  **Definition of Done**
+    *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]`.
+    *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure code style.
+    *   **Tests**: Verify all tests pass.

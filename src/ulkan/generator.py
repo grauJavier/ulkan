@@ -1,52 +1,54 @@
-import os
 from pathlib import Path
-from .templates import (
+
+from .styles import console
+from .templates import (  # noqa: F401 - templates is now a package
+    # ADR Creator
+    ADR_CREATOR_SKILL_MD,
+    ADR_TEMPLATE_MD,
     # Root
     AGENTS_MD_TEMPLATE,
-    # READMEs
-    SKILLS_README_TEMPLATE,
-    TOOLS_README_TEMPLATE,
-    RULES_README_TEMPLATE,
-    WORKFLOWS_README_TEMPLATE,
-    GUIDELINES_README_TEMPLATE,
-    SPECS_README_TEMPLATE,
-    PRODUCT_README_TEMPLATE,
+    ARCHITECTURE_TEMPLATE_MD,
+    BUG_FIX_WORKFLOW,
     DECISIONS_README_TEMPLATE,
+    DOCUMENTATION_CHECK_WORKFLOW,
+    # Standard Workflows
+    FEATURE_DEVELOPMENT_WORKFLOW,
+    GUIDELINE_TEMPLATE_MD,
+    # Guidelines Creator
+    GUIDELINES_CREATOR_SKILL_MD,
+    GUIDELINES_README_TEMPLATE,
+    LINT_AGENT_SETUP_PY,
+    MIGRATE_WORKFLOW,
+    # Product Docs Creator
+    PRODUCT_DOCS_CREATOR_SKILL_MD,
+    PRODUCT_INCEPTION_WORKFLOW,
+    PRODUCT_README_TEMPLATE,
+    REFACTORING_WORKFLOW,
+    RULE_TEMPLATE_MD,
+    # Rules Creator
+    RULES_CREATOR_SKILL_MD,
+    RULES_README_TEMPLATE,
     SCRIPTS_README_TEMPLATE,
     # Skill Creator
     SKILL_CREATOR_SKILL_MD,
     SKILL_TEMPLATE_MD,
-    # Rules Creator
-    RULES_CREATOR_SKILL_MD,
-    RULE_TEMPLATE_MD,
-    # Tools Creator
-    TOOLS_CREATOR_SKILL_MD,
-    TOOL_TEMPLATE_MD,
+    # READMEs
+    SKILLS_README_TEMPLATE,
+    SPEC_TEMPLATE_MD,
     # Specs Creator
     SPECS_CREATOR_SKILL_MD,
-    SPEC_TEMPLATE_MD,
-    # ADR Creator
-    ADR_CREATOR_SKILL_MD,
-    ADR_TEMPLATE_MD,
-    # Product Docs Creator
-    PRODUCT_DOCS_CREATOR_SKILL_MD,
-    VISION_TEMPLATE_MD,
-    ARCHITECTURE_TEMPLATE_MD,
-    # Guidelines Creator
-    GUIDELINES_CREATOR_SKILL_MD,
-    GUIDELINE_TEMPLATE_MD,
-    # Workflows Creator
-    WORKFLOWS_CREATOR_SKILL_MD,
-    WORKFLOW_TEMPLATE_MD,
-    # Standard Workflows
-    FEATURE_DEVELOPMENT_WORKFLOW,
-    BUG_FIX_WORKFLOW,
-    DOCUMENTATION_CHECK_WORKFLOW,
-    PRODUCT_INCEPTION_WORKFLOW,
-    REFACTORING_WORKFLOW,
+    SPECS_README_TEMPLATE,
     # Scripts
     SYNC_AGENTS_DOCS_PY,
-    LINT_AGENT_SETUP_PY,
+    TOOL_TEMPLATE_MD,
+    # Tools Creator
+    TOOLS_CREATOR_SKILL_MD,
+    TOOLS_README_TEMPLATE,
+    VISION_TEMPLATE_MD,
+    WORKFLOW_TEMPLATE_MD,
+    # Workflows Creator
+    WORKFLOWS_CREATOR_SKILL_MD,
+    WORKFLOWS_README_TEMPLATE,
 )
 
 
@@ -56,10 +58,29 @@ def create_directory(path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
-def write_file(path: Path, content: str) -> None:
-    """Writes content to a file."""
+def write_file(path: Path, content: str, base_path: Path | None = None) -> bool:
+    """Writes content to a file if it doesn't exist.
+
+    Args:
+        path: The file path to write to.
+        content: The content to write.
+        base_path: Optional base path for relative display in logs.
+
+    Returns:
+        True if file was created, False if it already existed.
+    """
+    if path.exists():
+        # Show relative path for better context
+        if base_path:
+            display_path = path.relative_to(base_path)
+        else:
+            display_path = f"{path.parent.name}/{path.name}"
+        console.print(f"[warning]  ⊘ Skipped: {display_path}[/warning]")
+        return False
+
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+    return True
 
 
 def generate_project(base_path: Path) -> None:
@@ -159,17 +180,12 @@ def generate_project(base_path: Path) -> None:
     )
 
     # 12. Standard Workflows
-    write_file(
-        agent_dir / "workflows" / "feature-development.md", FEATURE_DEVELOPMENT_WORKFLOW
-    )
-    write_file(agent_dir / "workflows" / "bug-fix.md", BUG_FIX_WORKFLOW)
-    write_file(
-        agent_dir / "workflows" / "documentation-check.md", DOCUMENTATION_CHECK_WORKFLOW
-    )
-    write_file(
-        agent_dir / "workflows" / "product-inception.md", PRODUCT_INCEPTION_WORKFLOW
-    )
-    write_file(agent_dir / "workflows" / "refactoring.md", REFACTORING_WORKFLOW)
+    write_file(agent_dir / "workflows" / "feat.md", FEATURE_DEVELOPMENT_WORKFLOW)
+    write_file(agent_dir / "workflows" / "fix.md", BUG_FIX_WORKFLOW)
+    write_file(agent_dir / "workflows" / "docs.md", DOCUMENTATION_CHECK_WORKFLOW)
+    write_file(agent_dir / "workflows" / "build.md", PRODUCT_INCEPTION_WORKFLOW)
+    write_file(agent_dir / "workflows" / "refactor.md", REFACTORING_WORKFLOW)
+    write_file(agent_dir / "workflows" / "migrate.md", MIGRATE_WORKFLOW)
 
     # 13. Scripts
     scripts_dir = agent_dir / "tools" / "scripts"

@@ -54,11 +54,12 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 
 | Workflow | Trigger | Goal |
 | :--- | :--- | :--- |
-| `/product-inception` | "New app", "From scratch" | Discovery -> Vision -> Architecture. |
-| `/feature-development` | "New feature" | Spec -> Plan -> Code -> Verification. |
-| `/bug-fix` | "Fix bug" | Repro -> Fix -> Verify -> Docs Update. |
-| `/refactoring` | "Refactor code" | Safety Check (Tests) -> Atomic Changes. |
-| `/documentation-check` | "Check docs", "Maintenance" | Ensure consistency across all docs. |
+| `/build` | "New app", "From scratch" | Discovery -> Vision -> Architecture. |
+| `/feat` | "New feature" | Spec -> Plan -> Code -> Verification. |
+| `/fix` | "Fix bug" | Repro -> Fix -> Verify -> Docs Update. |
+| `/refactor` | "Refactor code" | Safety Check (Tests) -> Atomic Changes. |
+| `/docs` | "Check docs", "Maintenance" | Ensure consistency across all docs. |
+| `/migrate` | "Migrate project" | Migrate existing agent configs to Ulkan. |
 
 ---
 

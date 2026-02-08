@@ -1,7 +1,8 @@
 import os
 import shutil
 from pathlib import Path
-from .styles import console, print_step, print_success, print_error
+
+from .styles import console, print_error, print_step, print_success
 
 
 def add_to_gitignore(root: Path, pattern: str) -> None:
@@ -54,7 +55,7 @@ def link_agents_md_to_root(root: Path, target_name: str) -> None:
     target_path = root / target_name
 
     if not agents_file.exists():
-        console.print(f"[warning]  ! AGENTS.md not found[/warning]")
+        console.print("[warning]  ! AGENTS.md not found[/warning]")
         return
 
     # Handle existing target
@@ -75,7 +76,7 @@ def link_copilot_instructions(root: Path) -> None:
     target_path = github_dir / "copilot-instructions.md"
 
     if not agents_file.exists():
-        console.print(f"[warning]  ! AGENTS.md not found[/warning]")
+        console.print("[warning]  ! AGENTS.md not found[/warning]")
         return
 
     # Create .github if it doesn't exist
@@ -90,7 +91,7 @@ def link_copilot_instructions(root: Path) -> None:
     # Create symlink: .github/copilot-instructions.md -> ../AGENTS.md
     target_path.symlink_to("../AGENTS.md")
     console.print(
-        f"[info]  ➜ Linked .github/copilot-instructions.md -> AGENTS.md[/info]"
+        "[info]  ➜ Linked .github/copilot-instructions.md -> AGENTS.md[/info]"
     )
 
 
@@ -145,3 +146,101 @@ def setup_copilot(root: Path) -> None:
     add_to_gitignore(root, ".github/copilot-instructions.md")
 
     print_success("GitHub Copilot configured!")
+
+
+def setup_opencode(root: Path) -> None:
+    """Configures OpenCode."""
+    print_step("Setting up OpenCode...")
+
+    # .opencode -> .agent
+    link_to_agent_folder(root, ".opencode")
+    add_to_gitignore(root, ".opencode")
+
+    # OpenCode reads AGENTS.md natively, no symlink needed
+    print_success("OpenCode configured! (Uses native AGENTS.md)")
+
+
+# ============================================================================
+# Removal Functions
+# ============================================================================
+
+
+def remove_symlink_if_valid(path: Path, expected_target: str) -> bool:
+    """Remove a symlink only if it points to the expected target.
+
+    Args:
+        path: Path to the symlink
+        expected_target: Expected target (e.g., '.agent', 'AGENTS.md')
+
+    Returns:
+        True if removed, False otherwise
+    """
+    if not path.is_symlink():
+        return False
+
+    target = os.readlink(path)
+    if expected_target in target:
+        path.unlink()
+        console.print(f"[info]  ✓ Removed {path.name}[/info]")
+        return True
+    return False
+
+
+def remove_claude(root: Path) -> int:
+    """Removes Claude symlinks."""
+    print_step("Removing Claude Code symlinks...")
+    count = 0
+    if remove_symlink_if_valid(root / ".claude", ".agent"):
+        count += 1
+    if remove_symlink_if_valid(root / "CLAUDE.md", "AGENTS.md"):
+        count += 1
+    return count
+
+
+def remove_gemini(root: Path) -> int:
+    """Removes Gemini symlinks."""
+    print_step("Removing Gemini CLI symlinks...")
+    count = 0
+    if remove_symlink_if_valid(root / ".gemini", ".agent"):
+        count += 1
+    if remove_symlink_if_valid(root / "GEMINI.md", "AGENTS.md"):
+        count += 1
+    return count
+
+
+def remove_codex(root: Path) -> int:
+    """Removes Codex symlinks."""
+    print_step("Removing Codex symlinks...")
+    count = 0
+    if remove_symlink_if_valid(root / ".codex", ".agent"):
+        count += 1
+    return count
+
+
+def remove_copilot(root: Path) -> int:
+    """Removes Copilot symlinks."""
+    print_step("Removing GitHub Copilot symlinks...")
+    count = 0
+    copilot_path = root / ".github" / "copilot-instructions.md"
+    if remove_symlink_if_valid(copilot_path, "AGENTS.md"):
+        count += 1
+    return count
+
+
+def remove_opencode(root: Path) -> int:
+    """Removes OpenCode symlinks."""
+    print_step("Removing OpenCode symlinks...")
+    count = 0
+    if remove_symlink_if_valid(root / ".opencode", ".agent"):
+        count += 1
+    return count
+
+
+# Agent name to remove function mapping
+AGENT_REMOVE_MAP = {
+    "claude": remove_claude,
+    "gemini": remove_gemini,
+    "codex": remove_codex,
+    "copilot": remove_copilot,
+    "opencode": remove_opencode,
+}

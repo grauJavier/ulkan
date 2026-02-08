@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release of Ulkan CLI
 - `ulkan init` command to scaffold agentic project structure
 - `ulkan adapt` command to create symlinks for AI agents
+- `ulkan sync` command to keep AGENTS.md up to date
+- `ulkan migrate` command to adopt existing agent configs
 - Support for Claude, Gemini, Codex, and Copilot
 - 8 built-in skills:
   - `skill-creator`
@@ -24,12 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `product-docs-creator`
   - `guidelines-creator`
   - `workflows-creator`
-- 5 standard workflows:
-  - `/product-inception`
-  - `/feature-development`
-  - `/bug-fix`
-  - `/refactoring`
-  - `/documentation-check`
+- 6 standard workflows:
+  - `/build`
+  - `/feat`
+  - `/fix`
+  - `/refactor`
+  - `/docs`
+  - `/migrate`
 - Maintenance scripts:
   - `sync_agents_docs.py`
   - `lint_agent_setup.py`

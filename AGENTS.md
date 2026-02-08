@@ -18,14 +18,14 @@ Use these skills to perform specialized tasks. **Check `.agent/skills/` for the 
 
 | Skill | Trigger | Description |
 | :--- | :--- | :--- |
-| `adr-creator` | \"Record decision\" | Creates updated Architecture Decision Records (ADRs).   Trigger: When user asks to document a dec... |
-| `guidelines-creator` | \"Define standard\" | Creates strict guidelines or best practices documentation.   Trigger: When user asks to document ... |
-| `product-docs-creator` | \"Vision/Architecture\" | Creates key product documentation (Vision, Architecture) using standard templates.   Trigger: Whe... |
-| `rules-creator` | \"Add a rule\" | Creates new AI agent rules to enforce system constraints.   Trigger: When user asks to define a n... |
-| `skill-creator` | \"Create/Add a skill\" | Creates new AI agent skills following the Agent Skills spec.   Trigger: When user asks to create ... |
-| `specs-creator` | \"New feature spec\" | Creates new technical specifications and feature requirement documents.   Trigger: When user asks... |
-| `tools-creator` | \"Create a tool/script\" | Creates new AI agent tools (scripts, MCP servers, or utilities).   Trigger: When user asks to cre... |
-| `workflows-creator` | \"Create a workflow\" | Creates repeatable workflow documentation.   Trigger: When user asks to define a new process, pro... |
+| `adr-creator` | "Record decision" | Creates updated Architecture Decision Records (ADRs).   Trigger: When user asks to document a dec... |
+| `guidelines-creator` | "Define standard" | Creates strict guidelines or best practices documentation.   Trigger: When user asks to document ... |
+| `product-docs-creator` | "Vision/Architecture" | Creates key product documentation (Vision, Architecture) using standard templates.   Trigger: Whe... |
+| `rules-creator` | "Add a rule" | Creates new AI agent rules to enforce system constraints.   Trigger: When user asks to define a n... |
+| `skill-creator` | "Create/Add a skill" | Creates new AI agent skills following the Agent Skills spec.   Trigger: When user asks to create ... |
+| `specs-creator` | "New feature spec" | Creates new technical specifications and feature requirement documents.   Trigger: When user asks... |
+| `tools-creator` | "Create a tool/script" | Creates new AI agent tools (scripts, MCP servers, or utilities).   Trigger: When user asks to cre... |
+| `workflows-creator` | "Create a workflow" | Creates repeatable workflow documentation.   Trigger: When user asks to define a new process, pro... |
 
 ### 🛡️ Active Rules
 Always-on constraints that must be followed. **Check `.agent/rules/` for details.**
@@ -47,11 +47,12 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 
 | Workflow | Trigger | Goal |
 | :--- | :--- | :--- |
-| `/bug-fix` | \"Fix bug\" | Protocol for bug fixes (Reproduction -> Fix -> Docs) |
-| `/documentation-check` | \"Check docs\" | Maintenance workflow to ensure docs consistency |
-| `/feature-development` | \"New feature\" | Guide for new features (Spec -> Plan -> Code -> Docs) |
-| `/product-inception` | \"New app/From scratch\" | Guide for new product definition (Discovery -> Vision -> Architecture) |
-| `/refactoring` | \"Refactor code\" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
+| `/build` | "New app/From scratch" | Guide for new product definition (Discovery -> Vision -> Architecture) |
+| `/docs` | "Check docs" | Maintenance workflow to ensure docs consistency |
+| `/feat` | "New feature" | Guide for new features (Spec -> Plan -> Code -> Docs) |
+| `/fix` | "Fix bug" | Protocol for bug fixes (Reproduction -> Fix -> Docs) |
+| `/migrate` | "Migrate project" | Migrate existing agent configs to Ulkan structure |
+| `/refactor` | "Refactor code" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
 
 ---
 
@@ -68,32 +69,45 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 ```
 ulkan/
 ├── src/ulkan/
-│   ├── main.py          # CLI entry point
-│   ├── commands.py      # Typer CLI commands (init, adapt)
-│   ├── generator.py     # Project structure generation
-│   ├── templates.py     # All file templates (~800 lines)
-│   ├── agents.py        # Agent adapter symlink logic
-│   └── styles.py        # Rich console styling
-├── pyproject.toml       # Hatchling build config
-└── AGENTS.md            # This file
+│   ├── main.py           # CLI entry point
+│   ├── commands.py       # Typer CLI commands (init, adapt)
+│   ├── generator.py      # Project structure generation
+│   ├── templates/        # Modular template package
+│   │   ├── __init__.py   # Re-exports all templates
+│   │   ├── agents.py     # AGENTS.md template
+│   │   ├── readme.py     # README templates
+│   │   ├── skills.py     # Skill creator templates
+│   │   ├── workflows.py  # Workflow templates
+│   │   └── scripts.py    # Script templates
+│   ├── agents.py         # Agent adapter symlink logic
+│   ├── builder.py        # AI CLI detection and build logic
+│   └── styles.py         # Rich console styling + Ulkan palette
+├── pyproject.toml        # Hatchling build config
+└── AGENTS.md             # This file
 ```
 
 **Commands**:
-- `ulkan init` - Scaffolds `.agent/` and `AGENTS.md` with all skills, workflows, and scripts
+- `ulkan init [PATH]` - Scaffolds `.agent/` and `AGENTS.md`, with interactive agent selection
+- `ulkan init -y` - Non-interactive mode (skips all prompts)
 - `ulkan adapt` - Creates symlinks for specific AI agents (Claude, Gemini, Codex, Copilot)
+- `ulkan build` - Uses adapted agent's CLI to analyze project and update docs
+- `ulkan remove <agent>` - Removes symlinks for a specific agent
+- `ulkan autoremove` - Removes symlinks for agents without CLI installed
 
 ### 🛠️ Tech Stack
 *   **Language**: Python 3.12+
-*   **CLI Framework**: Typer
+*   **CLI Framework**: Typer (with rich markup)
 *   **Output Styling**: Rich
+*   **Interactive Prompts**: InquirerPy (checkbox multi-select)
 *   **Build System**: Hatchling (PEP 517)
 *   **Package Manager**: uv
 
 ### 📦 Key Design Decisions
 
-1. **Single Source of Truth**: `.agent/` and `AGENTS.md` are the canonical sources. Agent-specific folders (`.claude`, `.gemini`) are symlinks.
-2. **Templates as Python Strings**: All file templates live in `templates.py` for easy maintenance and versioning.
-3. **Zero Runtime Dependencies**: Generated files use only Python stdlib (no yaml library required).
+1. **Single Source of Truth**: `.agent/` and `AGENTS.md` are the canonical sources. Agent-specific folders (`.claude`, `.gemini`) are symlinks. See [ADR-001](.agent/docs/decisions/001-single-source-of-truth-symlinks.md).
+2. **Modular Templates**: Templates organized as a package in `templates/` for maintainability.
+3. **Safe File Handling**: `init` skips existing files instead of overwriting, showing `⊘ Skipped: path`.
+4. **Ulkan Color Palette**: Consistent styling across CLI using Sky Blue (#87d7ff), Spiritual Blue (#5f5fff), Spring Green (#00ffaf).
 
 ---
 

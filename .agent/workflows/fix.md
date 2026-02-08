@@ -27,3 +27,8 @@ Use when resolving a reported bug or issue.
 5.  **Docs Check**
     *   Was the bug due to a missing or unclear guideline? -> Use `guidelines-creator`.
     *   Does the fix change behavior described in a Spec? -> Update the Spec.
+
+6.  **Definition of Done**
+    *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]` with the prefix `Fix:`.
+    *   **Linting**: Run `uv run ruff check` and `uv run black .`.
+    *   **Tests**: Affirm that the regression test passes and no other tests are broken.

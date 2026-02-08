@@ -50,6 +50,20 @@ pip install ulkan
 ulkan init
 ```
 
+Interactive mode prompts for agent selection:
+```
+? Select AI agents to adapt for: (↑↓ move, Space select, Enter confirm)
+  ○ Claude Code
+  ○ Gemini CLI
+  ○ Codex (OpenAI)
+  ○ GitHub Copilot
+```
+
+Or use `-y` for non-interactive mode:
+```bash
+ulkan init -y
+```
+
 Creates:
 ```
 your-project/
@@ -79,6 +93,24 @@ GEMINI.md → AGENTS.md
 .github/copilot-instructions.md → AGENTS.md
 ```
 
+### Build Documentation (AI-Powered)
+
+```bash
+ulkan build
+```
+
+Uses the adapted agent's CLI to analyze your project and update AGENTS.md:
+- Detects which agent is adapted (via symlinks)
+- Runs the corresponding CLI with a documentation prompt
+- Updates project context, architecture, and tech stack
+
+### Remove Adapters
+
+```bash
+ulkan remove claude    # Removes Claude symlinks
+ulkan autoremove       # Removes symlinks for agents without CLI installed
+```
+
 ## 🧠 Built-in Skills
 
 | Skill | Description |
@@ -96,18 +128,19 @@ GEMINI.md → AGENTS.md
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `/product-inception` | New project | Discovery → Vision → Architecture |
-| `/feature-development` | New feature | Spec → Plan → Code → Docs |
-| `/bug-fix` | Fix bug | Repro → Fix → Verify |
-| `/refactoring` | Refactor | Test baseline → Atomic changes |
-| `/documentation-check` | Maintenance | Sync and validate docs |
+| `/build` | New project | Discovery → Vision → Architecture |
+| `/feat` | New feature | Spec → Plan → Code → Docs |
+| `/fix` | Fix bug | Repro → Fix → Verify |
+| `/refactor` | Refactor | Test baseline → Atomic changes |
+| `/docs` | Maintenance | Sync and validate docs |
+| `/migrate` | Migrate project | Adopt Ulkan in existing projects |
 
 ## 🏗️ Why Ulkan?
 
 - **Single Source of Truth**: `.agent/` and `AGENTS.md` are canonical; agent folders are symlinks
 - **Zero Configuration**: Works immediately with Claude, Gemini, Copilot, Codex
 - **Best Practices Built-in**: Skills, workflows, and ADR templates included
-- **Maintenance Tools**: `sync_agents_docs.py` and `lint_agent_setup.py` keep things consistent
+- **Maintenance Tools**: `ulkan sync` keeps AGENTS.md up to date automatically
 
 ## 📚 Documentation
 
