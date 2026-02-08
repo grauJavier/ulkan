@@ -123,6 +123,7 @@ Access the built-in registry of skills, workflows, and tools.
 ### List Assets
 
 ```bash
+ulkan list all         # List ALL available assets
 ulkan list skills      # List available skills
 ulkan list workflows   # List available workflows
 ulkan list tools       # List available tools/scripts

@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `--gitignore` flag to `ulkan init` to automatically add `.agent/` and `AGENTS.md` to `.gitignore`.
-- `ulkan list <type>` command to view registry assets.
+- `ulkan list <type>` command to view registry assets (supports `all` to see everything).
 - `ulkan add <type> <name>` command to add individual assets to the project.
 - File-based Registry system replacing hardcoded templates.
 

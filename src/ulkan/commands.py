@@ -678,8 +678,10 @@ def migrate(
 
 @app.command()
 def list(
-    type: str = typer.Argument(
-        ..., help="Type of assets to list (skills, workflows, rules, tools)."
+    type_arg: str = typer.Argument(
+        ...,
+        metavar="TYPE",
+        help="Type of assets to list (skills, workflows, rules, tools). Use 'all' to list everything.",
     ),
 ) -> None:
     """
@@ -690,16 +692,33 @@ def list(
 
     print_banner(version=__version__)
 
+    # Handle "all" case
+    if type_arg == "all":
+        valid_types = ["skills", "workflows", "rules", "tools"]
+        for t in valid_types:
+            assets = list_assets(t)
+            console.print(f"[title]Available {t.capitalize()}:[/title]")
+            console.print()
+            if not assets:
+                console.print("  [dim]No assets found.[/dim]")
+            else:
+                for asset in assets:
+                    console.print(f"  • {asset}")
+            console.print()
+        return
+
     # Normalize type (allow singular)
-    if type.endswith("s"):
-        asset_type = type
+    if type_arg.endswith("s"):
+        asset_type = type_arg
     else:
         # Simple pluralization
-        asset_type = type + "s"
+        asset_type = type_arg + "s"
 
     valid_types = ["skills", "workflows", "rules", "tools"]
     if asset_type not in valid_types:
-        print_error(f"Invalid type: {type}. Valid options: {', '.join(valid_types)}")
+        print_error(
+            f"Invalid type: {type_arg}. Valid options: all, {', '.join(valid_types)}"
+        )
         raise typer.Exit(code=1)
 
     assets = list_assets(asset_type)

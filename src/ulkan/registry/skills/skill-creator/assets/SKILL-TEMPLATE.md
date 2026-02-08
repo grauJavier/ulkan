@@ -6,8 +6,12 @@ description: >
 trigger: "{Short trigger phrase for AGENTS.md}"
 license: Apache-2.0
 metadata:
-  author: ulkan
+  author: {github-url}
+  agent: {agent-name}
   version: "1.0"
+  scope: [root]
+  auto_invoke: "{When should this skill be automatically invoked?}"
+allowed-tools: {List, Of, Allowed, Tools, Or, *}
 ---
 
 ## When to Use
