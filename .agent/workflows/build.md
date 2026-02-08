@@ -5,33 +5,37 @@ trigger: "New app/From scratch"
 # Product Inception Workflow
 
 ## Trigger
-Use when the user wants to start a "new app", "new project", or "from scratch".
+Use when:
+1.  **New Project**: Starting "from scratch" or a "new app".
+2.  **Existing Project**: Adopting Ulkan late in a project or after migration.
 
 ## Steps
 
-1.  **Discovery (The "Must Answer" Questions)**
-    *   Ask the user to define the core essence. Use these questions as a guide:
-        1.  **Problem**: What specific pain point are we solving?
-        2.  **Users**: Who specifically will use this?
-        3.  **Value**: Why will they choose this solution?
-        4.  **Scale**: Is this a quick prototype or a production-ready system?
+1.  **Context Assessment**
+    *   **Determine State**: Is this a **greenfield** (empty/new) or **brownfield** (existing code) project?
 
-2.  **Capabilities Check**
-    *   **Leverage Skills**: Check `.agent/skills/` for architecture, scaffolding, or framework-specific skills.
-    *   **Tools**: Do I need to research new **Tools** (e.g., specific framework CLI)?
+2.  **Path A: New Project (Greenfield)**
+    1.  **Discovery (The "Must Answer" Questions)**
+        *   Ask: Problem, Users, Value, Scale.
+    2.  **Vision Definition**: Use `product-docs-creator` to generate `.agent/docs/product/VISION.md`.
+    3.  **Architecture**: Define tech stack & strategy in `.agent/docs/product/ARCHITECTURE.md`.
+    4.  **Capabilities Check**:
+        *   **Skills**: Do we need specific frameworks? -> Use `skill-creator`.
+        *   **Tools**: Do we need CLI tools? -> Use `tools-creator`.
+    5.  **Scaffold**: Create initial folder structure and core files.
 
-3.  **Vision Definition**
-    *   Use `product-docs-creator` to generate `.agent/docs/product/VISION.md`.
-    *   Populate it with the answers from Step 1.
+3.  **Path B: Existing Project (Brownfield)**
+    1.  **Audit**: Analyze existing codebase, tech stack, and patterns.
+    2.  **Reverse Engineering**:
+        *   Create `VISION.md` reflecting the *current* reality.
+        *   Create `ARCHITECTURE.md` documenting the *current* design.
+    3.  **Gap Analysis**:
+        *   **Skills**: Does the agent need to learn project-specific patterns? -> Use `skill-creator`.
+        *   **Tools**: Are there scripts/makefiles we should wrap as Tools? -> Use `tools-creator`.
+    4.  **Integration**:
+        *   Ensure `AGENTS.md` is fully populated.
+        *   Run `/docs` workflow to validate.
 
-4.  **Architecture & Autonomy**
-    *   Define the technical strategy in `.agent/docs/product/ARCHITECTURE.md`.
-    *   **Agent Autonomy Guidelines**:
-        *   **UI/UX**: Agent has autonomy to use standard, modern best practices.
-        *   **Code Structure**: Agent has autonomy to choose folder structure based on framework conventions.
-        *   **Libraries**: Agent can suggest/choose standard libraries.
-        *   **Major Decisions**: User must approve Database choice, Auth provider, and Hosting strategy.
-
-5.  **Validation**
+4.  **Validation (Both Paths)**
     *   Present the Vision and Architecture to the user.
     *   Ask: "Does this match your intent?"

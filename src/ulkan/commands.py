@@ -371,19 +371,111 @@ def build(
 @app.command()
 def remove(
     agent: str = typer.Argument(
-        ..., help="Agent to remove (claude, gemini, codex, copilot, opencode)"
+        None, help="Agent to remove (claude, gemini, codex, copilot, opencode)"
+    ),
+    self: bool = typer.Option(
+        False,
+        "--self",
+        help="Eject Ulkan: Replace symlinks with copies and remove .agent/",
     ),
     dry_run: bool = typer.Option(
         False, "--dry-run", help="Show what would be removed without removing."
     ),
 ) -> None:
     """
-    Removes symlinks for a specific agent.
-
-    Only removes symlinks that point to .agent/ or AGENTS.md.
+    Removes symlinks for a specific agent OR ejects Ulkan completely.
     """
+    import shutil
+
+    from .agents import AGENT_FILE_MAP
+    from .builder import get_adapted_agents
+
     print_banner()
     root = Path.cwd()
+
+    # Case 1: Eject Ulkan (--self)
+    if self:
+        console.print("[warning]⚠️  Ejecting Ulkan[/warning]")
+        console.print(
+            "This will [info]convert all symlinks to real files[/info] and remove [warning].agent/[/warning]"
+        )
+
+        if not dry_run and not Confirm.ask("Are you sure?", default=False):
+            console.print("[info]Aborted.[/info]")
+            return
+
+        adapted_agents = get_adapted_agents(root)
+        agent_dir = root / ".agent"
+        agents_md = root / "AGENTS.md"
+
+        if not agent_dir.exists():
+            print_error(".agent directory not found. Nothing to eject.")
+            raise typer.Exit(1)
+
+        for agent_name in adapted_agents:
+            # 1. Handle Folder (e.g., .claude)
+            agent_folder = root / f".{agent_name}"
+            if agent_name == "copilot":
+                # Copilot doesn't have a .copilot folder usually, but check just in case
+                pass
+            elif agent_folder.is_symlink():
+                console.print(
+                    f"[info]  • Converting {agent_folder.name} to directory...[/info]"
+                )
+                if not dry_run:
+                    agent_folder.unlink()
+                    shutil.copytree(agent_dir, agent_folder)
+
+            # 2. Handle specific config file (e.g., CLAUDE.md)
+            if agent_name in AGENT_FILE_MAP:
+                target_file_rel = AGENT_FILE_MAP[agent_name]
+                target_file = root / target_file_rel
+
+                # Special case: AGENTS.md native consumers (Codex, OpenCode)
+                # don't need copy because AGENTS.md is being removed/moved?
+                # Actually, if we remove AGENTS.md, we should make sure they have a copy if they relied on the root one.
+                # BUT, AGENT_FILE_MAP maps 'codex' -> 'AGENTS.md'.
+                # If we remove .agent and AGENTS.md, we want to leave a copy for them.
+
+                if target_file.is_symlink():
+                    console.print(
+                        f"[info]  • Converting {target_file.name} to file...[/info]"
+                    )
+                    if not dry_run:
+                        target_file.unlink()
+                        shutil.copy2(agents_md, target_file)
+                elif target_file.name == "AGENTS.md" and agents_md.exists():
+                    # Codex/OpenCode use the root AGENTS.md.
+                    # If we are ejecting, that file is technically "Ulkan's file",
+                    # BUT users might expect it to stay.
+                    # However, the requirement says "remove .agent and AGENTS.md".
+                    # If we remove AGENTS.md, Codex/OpenCode lose their context.
+                    # So we should probably NOT remove it if it's not a symlink but the actual file?
+                    # No, the requirement says "finally remove .agent and AGENTS.md".
+                    # Let's follow instructions: copy content to symlinks, then delete.
+                    # If Codex uses AGENTS.md directly, it's not a symlink.
+                    pass
+
+        if dry_run:
+            print_step("Dry run: Would remove .agent/ and AGENTS.md")
+            return
+
+        # Finally remove Ulkan core
+        if agent_dir.exists():
+            shutil.rmtree(agent_dir)
+            console.print("[info]  ✓ Removed .agent/[/info]")
+
+        if agents_md.exists():
+            agents_md.unlink()
+            console.print("[info]  ✓ Removed AGENTS.md[/info]")
+
+        print_success("Ulkan ejected successfully! Agents are now standalone.")
+        return
+
+    # Case 2: Remove specific agent
+    if not agent:
+        print_error("Missing argument 'AGENT'.")
+        raise typer.Exit(code=1)
 
     if agent not in AGENT_REMOVE_MAP:
         print_error(

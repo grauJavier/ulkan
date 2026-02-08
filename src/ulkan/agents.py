@@ -244,3 +244,12 @@ AGENT_REMOVE_MAP = {
     "copilot": remove_copilot,
     "opencode": remove_opencode,
 }
+
+# Mapping of agent names to their specific documentation file
+AGENT_FILE_MAP = {
+    "claude": "CLAUDE.md",
+    "gemini": "GEMINI.md",
+    "codex": "AGENTS.md",
+    "copilot": ".github/copilot-instructions.md",
+    "opencode": "AGENTS.md",
+}
