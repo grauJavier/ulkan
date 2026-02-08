@@ -48,7 +48,7 @@ jobs:
       
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
+        # with:
           # Uses trusted publishing (OIDC)
           # Configure at: https://pypi.org/manage/project/ulkan/settings/publishing/
 
