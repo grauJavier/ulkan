@@ -677,6 +677,89 @@ def migrate(
 
 
 @app.command()
+def list(
+    type: str = typer.Argument(
+        ..., help="Type of assets to list (skills, workflows, rules, tools)."
+    ),
+) -> None:
+    """
+    Lists available assets in the registry.
+    """
+    from .manager import list_assets
+    from . import __version__
+
+    print_banner(version=__version__)
+
+    # Normalize type (allow singular)
+    if type.endswith("s"):
+        asset_type = type
+    else:
+        # Simple pluralization
+        asset_type = type + "s"
+
+    valid_types = ["skills", "workflows", "rules", "tools"]
+    if asset_type not in valid_types:
+        print_error(f"Invalid type: {type}. Valid options: {', '.join(valid_types)}")
+        raise typer.Exit(code=1)
+
+    assets = list_assets(asset_type)
+
+    console.print(f"[title]Available {asset_type.capitalize()}:[/title]")
+    console.print()
+
+    if not assets:
+        console.print("[dim]  No assets found.[/dim]")
+    else:
+        for asset in assets:
+            console.print(f"  • {asset}")
+    console.print()
+
+
+@app.command()
+def add(
+    type: str = typer.Argument(
+        ..., help="Type of asset to add (skill, workflow, rule, tool)."
+    ),
+    name: str = typer.Argument(
+        ..., help="Name of the asset (e.g. feat, scripts/myscript.py)."
+    ),
+) -> None:
+    """
+    Adds an asset from the registry to your project.
+    """
+    from .manager import add_asset
+    from . import __version__
+
+    print_banner(version=__version__)
+    root = Path.cwd()
+
+    if not (root / ".agent").exists():
+        print_error(
+            ".agent directory not found. Run [prompt]ulkan init[/prompt] first."
+        )
+        raise typer.Exit(code=1)
+
+    # Normalize type to singular for add command logic
+    asset_type = type.rstrip("s")  # remove 's' if present (skill, workflow, rule, tool)
+
+    # Manager expects singular for add
+    valid_types = ["skill", "workflow", "rule", "tool"]
+    if asset_type not in valid_types:
+        print_error(f"Invalid type: {type}. Valid options: {', '.join(valid_types)}")
+        raise typer.Exit(code=1)
+
+    success = add_asset(asset_type, name, root)
+
+    if success:
+        print_success(f"Added {asset_type} '{name}' successfully! 🚀")
+        console.print(
+            "[info]Run [prompt]ulkan sync[/prompt] to update documentation.[/info]"
+        )
+    else:
+        raise typer.Exit(code=1)
+
+
+@app.command()
 def sync(
     check: bool = typer.Option(
         False, "--check", help="Return exit code 1 if documentation is out of sync."

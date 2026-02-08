@@ -202,7 +202,7 @@ def generate_project(base_path: Path) -> None:
 
     for script in scripts_to_install:
         copy_resource_file(
-            registry_root / "tools" / script,
+            registry_root / "tools" / "scripts" / script,
             agent_dir / "tools" / "scripts" / script,
             base_path,
         )

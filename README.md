@@ -116,6 +116,27 @@ ulkan remove claude    # Removes Claude symlinks
 ulkan autoremove       # Removes symlinks for agents without CLI installed
 ```
 
+## 📦 Registry Commands
+
+Access the built-in registry of skills, workflows, and tools.
+
+### List Assets
+
+```bash
+ulkan list skills      # List available skills
+ulkan list workflows   # List available workflows
+ulkan list tools       # List available tools/scripts
+```
+
+### Add Assets
+
+Add individual components to your project without re-initializing:
+
+```bash
+ulkan add skill my-skill           # Adds .agent/skills/my-skill
+ulkan add tool scripts/my-script.py # Adds .agent/tools/scripts/my-script.py
+```
+
 ## 🧠 Built-in Skills
 
 | Skill | Description |
