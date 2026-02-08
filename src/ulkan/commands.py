@@ -469,7 +469,13 @@ def remove(
             agents_md.unlink()
             console.print("[info]  ✓ Removed AGENTS.md[/info]")
 
-        print_success("Ulkan ejected successfully! Agents are now standalone.")
+        print_success("Ulkan ejected successfully! 🚀")
+        console.print(
+            "[info]  ➜ The 'Single Source of Truth' has been distributed.[/info]"
+        )
+        console.print(
+            "[info]  ➜ Your agents are now standalone and fully configured.[/info]"
+        )
         return
 
     # Case 2: Remove specific agent

@@ -1,35 +1,26 @@
-# Product Vision
+# Product Vision: Ulkan
 
-## Vision Statement
-**Ulkan** empowers developers to bootstrap AI-agent-ready projects in seconds, establishing a standardized architecture that any coding assistant can immediately understand and leverage.
+## 1. Mission Statement
+To make "agent-ready" the default state for every software project, eliminating the friction between human developers and AI assistants.
 
-## Target Group
-- **Solo developers** who work with AI coding assistants (Claude, Gemini, Copilot, Codex)
-- **Teams** wanting to standardize how AI agents interact with their codebase
-- **Open source maintainers** who want contributors' AI assistants to follow project conventions
+## 2. The Problem
+*   **Fragmentation**: Every developer configures their AI agent differently (system prompts, recommended extensions, ignored files).
+*   **Context Loss**: AI agents often lack the "big picture" (architecture, conventions, business goals) leading to hallucinations or misaligned code.
+*   **Maintenance Burden**: Keeping `CLAUDE.md`, `.cursorrules`, and custom instructions in sync is manual and error-prone.
 
-## Needs
-| Problem | Solution |
-|---------|----------|
-| Setting up AI agent configs is repetitive | One `ulkan init` creates everything |
-| Each agent has different config locations | `ulkan adapt` creates symlinks to single source |
-| No standard for agent skills/workflows | Ulkan provides 8 built-in skills + 5 workflows |
-| Documentation scattered across files | `AGENTS.md` as single entry point |
+## 3. The Solution: Ulkan
+Ulkan is an **Agentic Scaffolding Tool** that provides a standardized, agent-agnostic interface for any codebase.
 
-## Product
-**Ulkan** is a Python CLI tool that:
-1. **Scaffolds** a complete `.agent/` structure with skills, workflows, rules, and docs
-2. **Adapts** the structure for specific AI agents via symlinks
-3. **Provides** maintenance tools to keep documentation in sync
+*   **Standardized Context**: A strictly defined `.agent/` directory structure acting as the Single Source of Truth (SSOT).
+*   **Universal Compatibility**: Adapters that automatically generate configuration for specific agents (Claude, Gemini, Copilot, etc.) from the SSOT.
+*   **Living Documentation**: CLI tools (`ulkan sync`, `ulkan build`) that keep documentation fresh and accurate.
 
-### Key Features
-- `ulkan init` - Full project scaffolding
-- `ulkan adapt` - Agent-specific symlinks (Claude, Gemini, Codex, Copilot)
-- 8 built-in skills (skill-creator, adr-creator, specs-creator, etc.)
-- 5 standard workflows (feature-dev, bug-fix, refactoring, etc.)
-- Sync/lint scripts for maintenance
+## 4. Target Audience
+*   **Software Engineers** adapting to AI-assisted workflows.
+*   **Tech Leads** wanting to enforce consistency across team members' AI agents.
+*   **maintainers** of open-source projects who want to make their code base easily understandable by AI contributors.
 
-## Business Goals
-- Become the de-facto standard for AI-agent project scaffolding
-- Foster a community of shared skills and workflows
-- Reduce friction in AI-assisted development
+## 5. Core Values
+*   **Zero Magic**: Everything is explicit files and folders.
+*   **Agent Agnostic**: Don't lock into one specific AI vendor.
+*   **Automated Maintenance**: If it can be scripted, it shouldn't be a wiki page.

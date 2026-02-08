@@ -1,91 +1,57 @@
-# System Architecture
+# Architecture Overview: Ulkan
 
-## Overview
-Ulkan is a single-package Python CLI application that generates files and symlinks. It has no runtime dependencies beyond standard library for generated files, and uses Typer/Rich for the CLI experience.
+## 1. High-Level Design
 
-## Component Diagram (C4 Context)
+Ulkan operates on a "Hub and Spoke" model:
+*   **Hub**: The `.agent/` directory (Single Source of Truth).
+*   **Spokes**: The adapter files (e.g., `.claude/`, `copilot-instructions.md`) used by specific tools.
+*   **Engine**: The `ulkan` CLI which manages the synchronization between Hub and Spokes.
 
-```mermaid
-graph TD
-    subgraph User["Developer"]
-        CLI["ulkan CLI"]
-    end
+## 2. Tech Stack
 
-    subgraph Generated["Generated Structure"]
-        AGENTS["AGENTS.md"]
-        AGENT_DIR[".agent/"]
-        SKILLS[".agent/skills/"]
-        WORKFLOWS[".agent/workflows/"]
-        TOOLS[".agent/tools/"]
-    end
+| Component | Technology | Rationale |
+| :--- | :--- | :--- |
+| **Language** | Python 3.12+ | Modern, typed, compliant with latest standards. |
+| **CLI Framework** | `typer` | Type-hint based CLI creation, robust and easy to maintain. |
+| **Terminal UI** | `rich` | Beautiful, readable output is critical for developer tools. |
+| **Interactivity** | `inquirerpy` | robust interactive prompts for `init` and selection flows. |
+| **Packaging** | `hatchling` | Modern standards-based build backend. |
 
-    subgraph Adapters["Agent Adapters (Symlinks)"]
-        CLAUDE[".claude → .agent"]
-        GEMINI[".gemini → .agent"]
-        CODEX[".codex → .agent"]
-        COPILOT[".github/copilot-instructions.md → AGENTS.md"]
-    end
-
-    CLI -->|init| AGENTS
-    CLI -->|init| AGENT_DIR
-    CLI -->|adapt| CLAUDE
-    CLI -->|adapt| GEMINI
-    CLI -->|adapt| CODEX
-    CLI -->|adapt| COPILOT
-```
-
-## Package Structure
+## 3. Project Structure
 
 ```
 src/ulkan/
-├── main.py          # Entry point, exports Typer app
-├── commands.py      # CLI commands: init, adapt
-├── generator.py     # File/directory creation logic
-├── templates.py     # All file templates as Python strings (~800 lines)
-├── agents.py        # Symlink creation for agent adapters
-└── styles.py        # Rich console theming
+├── main.py          # Entry point
+├── commands.py      # CLI command definitions (init, build, adapt, sync)
+├── agents.py        # Logic for specific AI agent adapters
+├── generator.py     # Scaffolding logic (creating .agent structure)
+├── migrator.py      # Logic for ingesting existing agent configs
+├── syncer.py        # Documentation synchronization logic
+├── builder.py       # "AI Build" logic (LLM interaction)
+└── templates/       # Jinja2 templates for artifacts
 ```
 
-## Tech Stack
-- **Language**: Python 3.12+
-- **CLI Framework**: Typer (built on Click)
-- **Output Styling**: Rich
-- **Build System**: Hatchling (PEP 517)
-- **Package Manager**: uv
+## 4. Core Concepts
 
-## Key Design Patterns
+### 4.1. Single Source of Truth (SSOT)
+The `.agent/` folder contains canonical data:
+*   `skills/`: Reusable capabilities (e.g., "Create React Component").
+*   `workflows/`: Standard operating procedures (e.g., "Bug Fix Workflow").
+*   `rules/`: Active constraints.
+*   `docs/`: Product context.
 
-### 1. Templates as Python Strings
-All file templates are stored in `templates.py` as multiline strings. This:
-- Keeps templates under version control
-- Avoids file I/O for template loading
-- Makes testing easier (just import and compare)
+### 4.2. Adaptation
+The `adapt` command creates symbolic links or generated files mapping the SSOT to vendor-specific formats.
+*   *Example*: `.agent` -> `.claude` (Symlink) allows Claude CLI to see the standard structure as its own context.
 
-### 2. Single Source of Truth
-`.agent/` and `AGENTS.md` are canonical. Agent-specific folders are symlinks:
-```
-.claude → .agent
-.gemini → .agent
-CLAUDE.md → AGENTS.md
-```
+### 4.3. Synchronization
+The `sync` command ensures `AGENTS.md` (the human/agent readable index) reflects the actual state of the `.agent/` directory.
 
-### 3. Zero Runtime Dependencies
-Generated files (sync scripts, lint scripts) use only Python stdlib to avoid forcing users to install dependencies.
+## 5. Data Flow
 
-## Data Flow
-
-```
-ulkan init:
-  1. Create AGENTS.md from template
-  2. Create .agent/ directory tree
-  3. Write all skill SKILL.md files
-  4. Write all workflow .md files
-  5. Write maintenance scripts
-
-ulkan adapt --all:
-  1. Check .agent/ exists
-  2. For each agent:
-     - Remove existing folder/file
-     - Create symlink to .agent or AGENTS.md
-     - Add to .gitignore
-```
+1.  **User** runs `ulkan init`.
+2.  **Generator** creates `.agent/` structure.
+3.  **User** runs `ulkan adapt --claude`.
+4.  **Adapter** symlinks `.agent` to `.claude`.
+5.  **User** runs `ulkan build`.
+6.  **Builder** invokes the AI Agent to read project code and populate `AGENTS.md` context sections.
