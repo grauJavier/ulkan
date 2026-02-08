@@ -1,57 +1,13 @@
+import shutil
 from pathlib import Path
+from importlib import resources
 
 from .styles import console
-from .templates import (  # noqa: F401 - templates is now a package
-    # ADR Creator
-    ADR_CREATOR_SKILL_MD,
-    ADR_TEMPLATE_MD,
-    # Root
-    AGENTS_MD_TEMPLATE,
-    ARCHITECTURE_TEMPLATE_MD,
-    BUG_FIX_WORKFLOW,
-    DECISIONS_README_TEMPLATE,
-    DOCUMENTATION_CHECK_WORKFLOW,
-    # Standard Workflows
-    FEATURE_DEVELOPMENT_WORKFLOW,
-    GUIDELINE_TEMPLATE_MD,
-    # Guidelines Creator
-    GUIDELINES_CREATOR_SKILL_MD,
-    GUIDELINES_README_TEMPLATE,
-    GUIDELINES_README_TEMPLATE,
-    LINT_AGENT_SETUP_PY,
-    MANUAL_TEMPLATE_MD,
-    MIGRATE_WORKFLOW,
-    # Product Docs Creator
-    PRODUCT_DOCS_CREATOR_SKILL_MD,
-    PRODUCT_INCEPTION_WORKFLOW,
-    PRODUCT_README_TEMPLATE,
-    REFACTORING_WORKFLOW,
-    RULE_TEMPLATE_MD,
-    # Rules Creator
-    RULES_CREATOR_SKILL_MD,
-    RULES_README_TEMPLATE,
-    SCRIPTS_README_TEMPLATE,
-    # Skill Creator
-    SKILL_CREATOR_SKILL_MD,
-    SKILL_TEMPLATE_MD,
-    # READMEs
-    SKILLS_README_TEMPLATE,
-    SPEC_TEMPLATE_MD,
-    # Specs Creator
-    SPECS_CREATOR_SKILL_MD,
-    SPECS_README_TEMPLATE,
-    # Scripts
-    SYNC_AGENTS_DOCS_PY,
-    TOOL_TEMPLATE_MD,
-    # Tools Creator
-    TOOLS_CREATOR_SKILL_MD,
-    TOOLS_README_TEMPLATE,
-    VISION_TEMPLATE_MD,
-    WORKFLOW_TEMPLATE_MD,
-    # Workflows Creator
-    WORKFLOWS_CREATOR_SKILL_MD,
-    WORKFLOWS_README_TEMPLATE,
-)
+
+# Define paths to resources
+# Assuming they are packaged in src/ulkan/templates and src/ulkan/registry
+TEMPLATES_PKG = "ulkan.templates"
+REGISTRY_PKG = "ulkan.registry"
 
 
 def create_directory(path: Path) -> None:
@@ -60,36 +16,57 @@ def create_directory(path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
-def write_file(path: Path, content: str, base_path: Path | None = None) -> bool:
-    """Writes content to a file if it doesn't exist.
+def copy_resource_file(
+    source_path: Path, dest_path: Path, base_path: Path | None = None
+) -> bool:
+    """Copies a file from source path to destination path.
 
     Args:
-        path: The file path to write to.
-        content: The content to write.
+        source_path: Absolute path to source file.
+        dest_path: Absolute path to destination file.
         base_path: Optional base path for relative display in logs.
 
     Returns:
         True if file was created, False if it already existed.
     """
-    if path.exists():
+    if dest_path.exists():
         # Show relative path for better context
-        if base_path:
-            display_path = path.relative_to(base_path)
-        else:
-            display_path = f"{path.parent.name}/{path.name}"
+        display_path = (
+            dest_path.relative_to(base_path)
+            if base_path
+            else f"{dest_path.parent.name}/{dest_path.name}"
+        )
         console.print(f"[warning]  ⊘ Skipped: {display_path}[/warning]")
         return False
 
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
+    # Ensure parent dir exists
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        shutil.copy2(source_path, dest_path)
+    except FileNotFoundError:
+        console.print(f"[error]  ✖ Error: Source file not found: {source_path}[/error]")
+        return False
 
     # Show success message for created files
-    if base_path:
-        display_path = path.relative_to(base_path)
-    else:
-        display_path = f"{path.parent.name}/{path.name}"
+    display_path = (
+        dest_path.relative_to(base_path)
+        if base_path
+        else f"{dest_path.parent.name}/{dest_path.name}"
+    )
     console.print(f"[title]  ✔ Created: {display_path}[/title]")
     return True
+
+
+def get_package_path(package_name: str) -> Path:
+    """Get the absolute filesystem path of a package."""
+    # Simple relative path resolution for now
+    current_dir = Path(__file__).parent
+    if package_name == "ulkan.templates":
+        return current_dir / "templates"
+    elif package_name == "ulkan.registry":
+        return current_dir / "registry"
+    return current_dir
 
 
 def update_gitignore(base_path: Path) -> None:
@@ -136,107 +113,96 @@ def generate_project(base_path: Path) -> None:
         base_path: The root directory where the project will be initialized.
     """
 
+    templates_root = get_package_path(TEMPLATES_PKG)
+    registry_root = get_package_path(REGISTRY_PKG)
+
+    if not templates_root.exists():
+        console.print(
+            f"[error]Templates directory not found at {templates_root}[/error]"
+        )
+        return
+
+    if not registry_root.exists():
+        console.print(f"[error]Registry directory not found at {registry_root}[/error]")
+        return
+
     # 1. Root Manifest (AGENTS.md)
-    write_file(base_path / "AGENTS.md", AGENTS_MD_TEMPLATE)
+    copy_resource_file(templates_root / "AGENTS.md", base_path / "AGENTS.md", base_path)
 
-    # 2. Core Directories
+    # 2. Core Directories & Scaffolding (READMEs and Manual)
+    # We mirror the structure of templates/ into .agent/
+    # templates/docs/ULKAN_MANUAL.md -> .agent/docs/ULKAN_MANUAL.md
+
     agent_dir = base_path / ".agent"
-    create_directory(agent_dir / "skills")
-    create_directory(agent_dir / "tools" / "scripts")
-    create_directory(agent_dir / "tools" / "mcp")
-    create_directory(agent_dir / "tools" / "utils")
-    create_directory(agent_dir / "rules")
-    create_directory(agent_dir / "workflows")
 
-    create_directory(agent_dir / "docs" / "product")
-    create_directory(agent_dir / "docs" / "guidelines")
-    create_directory(agent_dir / "docs" / "specs")
-    create_directory(agent_dir / "docs" / "decisions")
+    # Define mapping of template file (relative to templates root) -> destination (relative to .agent root)
+    scaffolding_files = {
+        "docs/ULKAN_MANUAL.md": "docs/ULKAN_MANUAL.md",
+        "skills/README.md": "skills/README.md",
+        "tools/README.md": "tools/README.md",
+        "tools/scripts/README.md": "tools/scripts/README.md",
+        "rules/README.md": "rules/README.md",
+        "workflows/README.md": "workflows/README.md",
+        "docs/guidelines/README.md": "docs/guidelines/README.md",
+        "docs/specs/README.md": "docs/specs/README.md",
+        "docs/product/README.md": "docs/product/README.md",
+        "docs/decisions/README.md": "docs/decisions/README.md",
+    }
 
-    # 3. Manual
-    write_file(agent_dir / "docs" / "ULKAN_MANUAL.md", MANUAL_TEMPLATE_MD)
+    for src_rel, dest_rel in scaffolding_files.items():
+        copy_resource_file(templates_root / src_rel, agent_dir / dest_rel, base_path)
 
-    # 3. READMEs
-    write_file(agent_dir / "skills" / "README.md", SKILLS_README_TEMPLATE)
-    write_file(agent_dir / "tools" / "README.md", TOOLS_README_TEMPLATE)
-    write_file(agent_dir / "tools" / "scripts" / "README.md", SCRIPTS_README_TEMPLATE)
-    write_file(agent_dir / "rules" / "README.md", RULES_README_TEMPLATE)
-    write_file(agent_dir / "workflows" / "README.md", WORKFLOWS_README_TEMPLATE)
-    write_file(
-        agent_dir / "docs" / "guidelines" / "README.md", GUIDELINES_README_TEMPLATE
-    )
-    write_file(agent_dir / "docs" / "specs" / "README.md", SPECS_README_TEMPLATE)
-    write_file(agent_dir / "docs" / "product" / "README.md", PRODUCT_README_TEMPLATE)
-    write_file(
-        agent_dir / "docs" / "decisions" / "README.md", DECISIONS_README_TEMPLATE
-    )
+    # 3. Registry Components (Skills)
+    # Mapping: Skill Name -> Source Folder (relative to registry/skills)
+    skills_to_install = [
+        "skill-creator",
+        "rules-creator",
+        "tools-creator",
+        "specs-creator",
+        "adr-creator",
+        "product-docs-creator",
+        "guidelines-creator",
+        "workflows-creator",
+    ]
 
-    # 4. Skill Creator
-    skill_creator_dir = agent_dir / "skills" / "skill-creator"
-    create_directory(skill_creator_dir / "assets")
-    write_file(skill_creator_dir / "SKILL.md", SKILL_CREATOR_SKILL_MD)
-    write_file(skill_creator_dir / "assets" / "SKILL-TEMPLATE.md", SKILL_TEMPLATE_MD)
+    for skill in skills_to_install:
+        src_skill_dir = registry_root / "skills" / skill
+        dest_skill_dir = agent_dir / "skills" / skill
 
-    # 5. Rules Creator
-    rules_creator_dir = agent_dir / "skills" / "rules-creator"
-    create_directory(rules_creator_dir / "assets")
-    write_file(rules_creator_dir / "SKILL.md", RULES_CREATOR_SKILL_MD)
-    write_file(rules_creator_dir / "assets" / "RULE-TEMPLATE.md", RULE_TEMPLATE_MD)
+        # Recursively copy the skill folder
+        if src_skill_dir.exists():
+            # Using copytree functionality manually to use our safe copying/logging
+            for src_file in src_skill_dir.rglob("*"):
+                if src_file.is_file():
+                    rel_path = src_file.relative_to(src_skill_dir)
+                    dest_file = dest_skill_dir / rel_path
+                    copy_resource_file(src_file, dest_file, base_path)
+        else:
+            console.print(f"[error]Skill {skill} not found in registry.[/error]")
 
-    # 6. Tools Creator
-    tools_creator_dir = agent_dir / "skills" / "tools-creator"
-    create_directory(tools_creator_dir / "assets")
-    write_file(tools_creator_dir / "SKILL.md", TOOLS_CREATOR_SKILL_MD)
-    write_file(tools_creator_dir / "assets" / "TOOL-TEMPLATE.md", TOOL_TEMPLATE_MD)
+    # 4. Registry Components (Workflows)
+    workflows_to_install = {
+        "feat.md": "feat.md",
+        "fix.md": "fix.md",
+        "docs.md": "docs.md",
+        "build.md": "build.md",
+        "refact.md": "refact.md",
+        "migrate.md": "migrate.md",
+    }
 
-    # 7. Specs Creator
-    specs_creator_dir = agent_dir / "skills" / "specs-creator"
-    create_directory(specs_creator_dir / "assets")
-    write_file(specs_creator_dir / "SKILL.md", SPECS_CREATOR_SKILL_MD)
-    write_file(specs_creator_dir / "assets" / "SPEC-TEMPLATE.md", SPEC_TEMPLATE_MD)
+    for src_file, dest_file in workflows_to_install.items():
+        copy_resource_file(
+            registry_root / "workflows" / src_file,
+            agent_dir / "workflows" / dest_file,
+            base_path,
+        )
 
-    # 8. ADR Creator
-    adr_creator_dir = agent_dir / "skills" / "adr-creator"
-    create_directory(adr_creator_dir / "assets")
-    write_file(adr_creator_dir / "SKILL.md", ADR_CREATOR_SKILL_MD)
-    write_file(adr_creator_dir / "assets" / "ADR-TEMPLATE.md", ADR_TEMPLATE_MD)
+    # 5. Registry Components (Tools/Scripts)
+    scripts_to_install = ["sync_agents_docs.py", "lint_agent_setup.py"]
 
-    # 9. Product Docs Creator
-    product_docs_dir = agent_dir / "skills" / "product-docs-creator"
-    create_directory(product_docs_dir / "assets")
-    write_file(product_docs_dir / "SKILL.md", PRODUCT_DOCS_CREATOR_SKILL_MD)
-    write_file(product_docs_dir / "assets" / "VISION-TEMPLATE.md", VISION_TEMPLATE_MD)
-    write_file(
-        product_docs_dir / "assets" / "ARCHITECTURE-TEMPLATE.md",
-        ARCHITECTURE_TEMPLATE_MD,
-    )
-
-    # 10. Guidelines Creator
-    guidelines_creator_dir = agent_dir / "skills" / "guidelines-creator"
-    create_directory(guidelines_creator_dir / "assets")
-    write_file(guidelines_creator_dir / "SKILL.md", GUIDELINES_CREATOR_SKILL_MD)
-    write_file(
-        guidelines_creator_dir / "assets" / "GUIDELINE-TEMPLATE.md",
-        GUIDELINE_TEMPLATE_MD,
-    )
-
-    # 11. Workflows Creator
-    workflows_creator_dir = agent_dir / "skills" / "workflows-creator"
-    create_directory(workflows_creator_dir / "assets")
-    write_file(workflows_creator_dir / "SKILL.md", WORKFLOWS_CREATOR_SKILL_MD)
-    write_file(
-        workflows_creator_dir / "assets" / "WORKFLOW-TEMPLATE.md", WORKFLOW_TEMPLATE_MD
-    )
-
-    # 12. Standard Workflows
-    write_file(agent_dir / "workflows" / "feat.md", FEATURE_DEVELOPMENT_WORKFLOW)
-    write_file(agent_dir / "workflows" / "fix.md", BUG_FIX_WORKFLOW)
-    write_file(agent_dir / "workflows" / "docs.md", DOCUMENTATION_CHECK_WORKFLOW)
-    write_file(agent_dir / "workflows" / "build.md", PRODUCT_INCEPTION_WORKFLOW)
-    write_file(agent_dir / "workflows" / "refact.md", REFACTORING_WORKFLOW)
-    write_file(agent_dir / "workflows" / "migrate.md", MIGRATE_WORKFLOW)
-
-    # 13. Scripts
-    scripts_dir = agent_dir / "tools" / "scripts"
-    write_file(scripts_dir / "sync_agents_docs.py", SYNC_AGENTS_DOCS_PY)
-    write_file(scripts_dir / "lint_agent_setup.py", LINT_AGENT_SETUP_PY)
+    for script in scripts_to_install:
+        copy_resource_file(
+            registry_root / "tools" / script,
+            agent_dir / "tools" / "scripts" / script,
+            base_path,
+        )
