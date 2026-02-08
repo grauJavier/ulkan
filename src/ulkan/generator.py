@@ -83,6 +83,43 @@ def write_file(path: Path, content: str, base_path: Path | None = None) -> bool:
     return True
 
 
+def update_gitignore(base_path: Path) -> None:
+    """Updates .gitignore to include .agent and AGENTS.md.
+
+    Args:
+        base_path: The root directory of the project.
+    """
+    gitignore_path = base_path / ".gitignore"
+    entries_to_add = [".agent/", "AGENTS.md"]
+
+    if gitignore_path.exists():
+        content = gitignore_path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+
+        # Check what's missing
+        missing = [entry for entry in entries_to_add if entry not in lines]
+
+        if missing:
+            with open(gitignore_path, "a", encoding="utf-8") as f:
+                if content and not content.endswith("\n"):
+                    f.write("\n")
+                f.write("\n# Ulkan\n")
+                for entry in missing:
+                    f.write(f"{entry}\n")
+            console.print(
+                f"[success]Updated .gitignore with: {', '.join(missing)}[/success]"
+            )
+        else:
+            console.print("[info].gitignore already contains Ulkan entries.[/info]")
+    else:
+        # Create new .gitignore
+        content = "# Ulkan\n" + "\n".join(entries_to_add) + "\n"
+        gitignore_path.write_text(content, encoding="utf-8")
+        console.print(
+            f"[success]Created .gitignore with: {', '.join(entries_to_add)}[/success]"
+        )
+
+
 def generate_project(base_path: Path) -> None:
     """Generates the agentic project structure.
 

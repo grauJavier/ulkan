@@ -59,6 +59,9 @@ def init(
         ".", help="Path to initialize the project in. Defaults to current directory."
     ),
     force: bool = typer.Option(False, "--yes", "-y", help="Skip confirmation prompt."),
+    gitignore: bool = typer.Option(
+        False, "--gitignore", help="Add .agent and AGENTS.md to .gitignore"
+    ),
 ) -> None:
     """
     Scaffolds a new agentic project structure.
@@ -150,6 +153,12 @@ def init(
         except Exception as e:
             print_error(f'Failed to generate project: {e}"')
             raise typer.Exit(code=1) from e
+
+    # Update .gitignore if requested
+    if gitignore:
+        from .generator import update_gitignore
+
+        update_gitignore(target_path)
 
     # Apply selected adapters
     if selected_agents:
