@@ -148,8 +148,7 @@ def init(
     from .updater import check_for_update
 
     # Check for updates (non-blocking, fails silently)
-    _, new_version = check_for_update(__version__)
-    has_update = new_version and new_version != __version__
+    has_update, new_version = check_for_update(__version__)
 
     print_banner(version=__version__, new_version=new_version if has_update else None)
 

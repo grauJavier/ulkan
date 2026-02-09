@@ -39,9 +39,8 @@ def check_for_update(current_version: str) -> tuple[bool, str | None]:
         if Version(latest) > Version(current_version):
             return True, latest
     except Exception:
-        # If parsing fails, do string comparison
-        if latest != current_version:
-            return True, latest
+        # Fallback to False if we can't compare reliably
+        return False, latest
 
     return False, latest
 
