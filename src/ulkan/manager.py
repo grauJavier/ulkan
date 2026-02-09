@@ -188,28 +188,55 @@ def install_skill_from_api(name: str, base_path: Path) -> bool:
         else:
             target_dir.mkdir(parents=True, exist_ok=True)
 
-        # Write SKILL.md
+        # Prepare valid YAML frontmatter
+        # We try to fill as much as we can from API data
+        title = target_skill.get("title", name)
+        # Description: clean up newlines for YAML block scalar if needed, or just use string
+        # user requested: description: > ...
+        raw_desc = target_skill.get("description", "")
+        if not raw_desc and "metadata" in target_skill:
+            raw_desc = target_skill["metadata"].get("description", "")
+        if not raw_desc:
+            # Try to take first paragraph of content
+            raw_desc = content.split("\n\n")[0].strip()
+
+        # Clean description for YAML (basic)
+        description = raw_desc.replace('"', '\\"')
+
+        # Author
+        author = "Unknown"
+        if "metadata" in target_skill:
+            author = target_skill["metadata"].get("author", "Unknown")
+
+        # License
+        license_ = "Apache-2.0"  # Default as requested, or fetch if available
+        if "metadata" in target_skill:
+            license_ = target_skill["metadata"].get("license", "Apache-2.0")
+
+        # Construct Frontmatter
+        frontmatter = f"""---
+name: {safe_name}
+description: >
+  {description}
+trigger: "User asks for {title} or related concepts"
+license: {license_}
+metadata:
+  author: {author}
+  agent: universal
+  version: "1.0"
+  scope: [root]
+  auto_invoke: "When user specifically requests {title} features"
+allowed-tools: *
+---
+
+"""
+
+        # Write SKILL.md with frontmatter prepended
         skill_file = target_dir / "SKILL.md"
-        skill_file.write_text(content, encoding="utf-8")
+        final_content = frontmatter + content
+        skill_file.write_text(final_content, encoding="utf-8")
 
-        # Write metadata (optional but good)
-        metadata = target_skill.get("metadata", {})
-        # Merge with our own metadata
-        metadata.update(
-            {
-                "source": "skyll",
-                "original_title": target_skill.get("title"),
-                "install_count": target_skill.get("install_count"),
-                "relevance_score": target_skill.get("relevance_score"),
-                "id": target_skill.get("id"),
-            }
-        )
-
-        import json
-
-        (target_dir / "metadata.json").write_text(
-            json.dumps(metadata, indent=2), encoding="utf-8"
-        )
+        # NO metadata.json creation (as per user request "envés del metadata") is implicitly done by removing that block.
 
         console.print(
             f"[success]Installed skill '{safe_name}' from Skyll API![/success]"

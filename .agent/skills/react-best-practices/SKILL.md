@@ -1,3 +1,18 @@
+---
+name: react-best-practices
+description: >
+  Provides React patterns for hooks, effects, refs, and component design. Covers escape hatches, anti-patterns, and correct effect usage. Must use when reading or writing React components (.tsx, .jsx files with React imports).
+trigger: "User asks for react-best-practices or related concepts"
+license: Apache-2.0
+metadata:
+  author: Unknown
+  agent: universal
+  version: "1.0"
+  scope: [root]
+  auto_invoke: "When user specifically requests react-best-practices features"
+allowed-tools: *
+---
+
 # React Best Practices
 
 ## Pair with TypeScript
