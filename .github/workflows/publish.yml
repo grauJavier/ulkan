@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
@@ -10,7 +12,33 @@ permissions:
   id-token: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv sync --dev
+      
+      - name: Check formatting (Black)
+        run: uv run black --check .
+      
+      - name: Test CLI runs
+        run: |
+          uv run ulkan --help
+          uv run ulkan init --help
+          uv run ulkan adapt --help
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +83,8 @@ jobs:
   github-release:
     needs: build
     runs-on: ubuntu-latest
+    # Solo crear release cuando es un tag
+    if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
       - uses: actions/checkout@v4
