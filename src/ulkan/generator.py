@@ -131,7 +131,6 @@ def generate_project(base_path: Path) -> None:
 
     # Define mapping of template file (relative to blueprints root) -> destination (relative to .agent root)
     scaffolding_files = {
-        "docs/ULKAN_MANUAL.md": "docs/ULKAN_MANUAL.md",
         "skills/README.md": "skills/README.md",
         "tools/README.md": "tools/README.md",
         "tools/scripts/README.md": "tools/scripts/README.md",

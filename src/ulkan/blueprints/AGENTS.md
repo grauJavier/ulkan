@@ -8,12 +8,25 @@
 
 When you start a task, follow this **Search Order**:
 1.  **Workflows** (`.agent/workflows/`): Is there a standard procedure for what I'm doing? (e.g., Feature Dev, Bug Fix).
-2.  **Rules** (`.agent/rules/`): Are there constraints I must follow?
-3.  **Skills** (`.agent/skills/`): Do I have a specific Skill for this? (e.g., creating docs, managing ADRs).
+2.  **Native Tools**: Use `ulkan search` and `ulkan list` to find existing capabilities.
+3.  **Rules** (`.agent/rules/`): Are there constraints I must follow?
+4.  **Skills** (`.agent/skills/`): Do I have a specific Skill for this? (e.g., creating docs, managing ADRs).
 
 ---
 
 ## 2. The Agent System
+
+### ⚡ Native Tools & Commands
+Use the `ulkan` CLI to maintain the project and your own context.
+
+| Command | Usage | Description |
+| :--- | :--- | :--- |
+| **`ulkan search`** | `ulkan search <query>` | Search the **Skyll API** for Skills, Workflows, or Tools. |
+| **`ulkan list`** | `ulkan list <type>` | View installed assets in `.agent/`. |
+| **`ulkan add`** | `ulkan add <type> <name>` | Install an asset from the registry. |
+| **`ulkan sync`** | `ulkan sync` | **ALWAYS** run this after modifying assets to update `AGENTS.md`. |
+| **`ulkan upgrade`** | `ulkan upgrade` | Check for and install the latest version of Ulkan. |
+| **`ulkan adapt`** | `ulkan adapt --[agent]` | Restore configuration for a specific agent. |
 
 ### 🧠 Core Skills
 Use these skills to perform specialized tasks. **Check `.agent/skills/` for the full list.**
