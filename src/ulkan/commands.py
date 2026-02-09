@@ -755,16 +755,33 @@ def list(
 @app.command()
 def search(
     query: str = typer.Argument(..., help="Search term to find assets."),
+    sort: str = typer.Option(
+        None, "--sort", "-s", help="Sort by 'installs' or 'relevance'."
+    ),
 ) -> None:
     """
-    Searches for assets in the registry.
+    Searches for assets in the registry (Skyll API).
     """
     from .manager import search_assets
     from . import __version__
+    from rich.table import Table
 
     print_banner(version=__version__)
 
-    results = search_assets(query)
+    # Validate sort option
+    if sort and sort not in ["installs", "relevance"]:
+        print_error("Invalid sort option. Use 'installs' or 'relevance'.")
+        raise typer.Exit(1)
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+        transient=True,
+    ) as progress:
+        task = progress.add_task(description=f"Searching for '{query}'...", total=None)
+        results = search_assets(query, sort_by=sort)
+        progress.update(task, completed=100)
 
     console.print(f"[title]Search Results for '{query}':[/title]")
     console.print()
@@ -772,8 +789,21 @@ def search(
     if not results:
         console.print("[dim]  No assets found.[/dim]")
     else:
-        for result in results:
-            console.print(f"  • {result}")
+        table = Table(box=None, header_style="bold #5f5fff")
+        table.add_column("Name", style="bold #87d7ff")
+        table.add_column("Installs", justify="right", style="#00ffaf")
+        table.add_column("Score", justify="right", style="dim")
+        table.add_column("Description")
+
+        for res in results:
+            table.add_row(
+                res["name"],
+                str(res["install_count"]),
+                f"{res['score']:.1f}",
+                res["description"],
+            )
+
+        console.print(table)
 
     console.print()
     console.print(

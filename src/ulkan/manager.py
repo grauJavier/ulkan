@@ -47,25 +47,73 @@ def list_assets(asset_type: str) -> List[str]:
     return sorted(assets)
 
 
-def search_assets(query: str) -> List[str]:
-    """Searches for assets matching the query.
+import httpx
+from rich.console import Console
+
+SKYLL_API_URL = "https://api.skyll.app/search"
+
+
+def search_assets(query: str, limit: int = 50, sort_by: str = None) -> List[dict]:
+    """Searches for assets using the Skyll API.
 
     Args:
         query: Search term.
+        limit: Number of results to return (default 50).
+        sort_by: Optional sorting criteria ('installs' or 'relevance').
+                 Note: API sorts by relevance by default. 'installs' is done client-side.
 
     Returns:
-        List of matching assets in format 'type/name'.
+        List of dicts with keys: name, description, install_count, score, source.
     """
-    results = []
-    for asset_type in ["skills", "workflows", "rules", "tools"]:
-        items = list_assets(asset_type)
-        for item in items:
-            if query.lower() in item.lower():
-                # Singularize type for display/add command
-                singular_type = asset_type.rstrip("s")
-                results.append(f"{singular_type}/{item}")
+    try:
+        response = httpx.get(
+            SKYLL_API_URL, params={"q": query, "limit": limit}, timeout=10.0
+        )
+        response.raise_for_status()
+        data = response.json()
 
-    return sorted(results)
+        # Determine where the skills list is (top-level or inside payload)
+        # Based on user info: { "query": ..., "count": ..., "skills": [...] }
+        skills = data.get("skills", [])
+        if not skills and "payload" in data:
+            skills = data["payload"].get("skills", [])
+
+        results = []
+        for item in skills:
+            # Extract description from content (first line or truncated)
+            content = item.get("content", "")
+            description = (
+                content.split("\n")[0][:100] + "..." if content else "No description"
+            )
+
+            # If metadata exists, check if it has description
+            if "metadata" in item and isinstance(item["metadata"], dict):
+                meta = item["metadata"]
+                if "description" in meta:
+                    description = meta["description"]
+
+            results.append(
+                {
+                    "name": item.get("title", "Unknown"),
+                    "description": description,
+                    "install_count": item.get("install_count", 0),
+                    "score": item.get("relevance_score", 0),
+                    "source": "skyll",  # Marker to know source
+                }
+            )
+
+        # Client-side sorting if requested
+        if sort_by == "installs":
+            results.sort(key=lambda x: x["install_count"], reverse=True)
+        # Relevance is default from API, but we can enforce it if needed
+        elif sort_by == "relevance":
+            results.sort(key=lambda x: x["score"], reverse=True)
+
+        return results
+
+    except Exception as e:
+        console.print(f"[error]Failed to search Skyll API: {e}[/error]")
+        return []
 
 
 def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
