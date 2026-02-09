@@ -22,17 +22,21 @@ Use when starting a new feature or significant enhancement.
     *   Create or update `implementation_plan.md`.
     *   Get user approval.
 
-4.  **Implementation**
+4.  **Branching**
+    *   Follow the branching strategy defined in `/git-flow`.
+
+5.  **Implementation**
     *   Write tests (TDD/BDD if applicable).
     *   Implement the code.
     *   Follow `.agent/docs/guidelines/`.
 
-3.  **Docs Check (Crucial)**
+6.  **Docs Check (Crucial)**
     *   Does this change affect `ARCHITECTURE.md`? -> Update it.
     *   Did we make a significant tech decision? -> Use `adr-creator`.
     *   Did we follow all rules? -> Check `.agent/rules/`.
 
-6.  **Definition of Done**
+7.  **Definition of Done**
     *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]`.
     *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure code style.
     *   **Tests**: Verify all tests pass.
+    *   **Merge**: Follow the merge strategy defined in `/git-flow`.

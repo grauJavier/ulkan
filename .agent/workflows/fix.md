@@ -13,9 +13,8 @@ Use when resolving a reported bug or issue.
     *   Create a test case that reproduces the failure.
     *   Analyze logs and behavior.
 
-2.  **Capabilities Check**
-    *   **Skill Check**: Is there a debugging skill in `.agent/skills/`?
-    *   **Tool Check**: Do I need a specific Tool to debug this? (If yes, use `tools-creator`).
+2.  **Branching**
+    *   Follow the branching strategy defined in `/git-flow` (Hotfix or Bugfix).
 
 3.  **Fix**
     *   Implement the fix.
@@ -33,3 +32,4 @@ Use when resolving a reported bug or issue.
     *   **Linting**: Run `uv run ruff check` and `uv run black .`.
     *   **Tests**: Affirm that the regression test passes and no other tests are broken.
     *   **Docs**: Run the `/docs` workflow to lint and sync documentation.
+    *   **Merge**: Follow the merge strategy defined in `/git-flow`.
