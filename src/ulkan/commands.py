@@ -932,3 +932,76 @@ def upgrade() -> None:
     else:
         print_error("Upgrade failed. Try manually: pip install --upgrade ulkan")
         raise typer.Exit(code=1)
+
+
+@app.command()
+def uninstall(
+    yes: bool = typer.Option(False, "--yes", "-y", help="Skip confirmation prompt."),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show the command without running it."
+    ),
+) -> None:
+    """
+    Uninstalls Ulkan from the system.
+    """
+    import subprocess
+    import sys
+
+    print_header(version=__version__)
+
+    console.print("[warning]⚠️  Uninstalling Ulkan[/warning]")
+    console.print("This will remove the [bold]ulkan[/bold] package from your system.")
+    console.print()
+
+    if (
+        not yes
+        and not dry_run
+        and not Confirm.ask("Are you sure you want to uninstall Ulkan?", default=False)
+    ):
+        console.print("[info]Aborted.[/info]")
+        raise typer.Exit()
+
+    print_step("Detecting installation method...")
+
+    method = None
+    uninstall_cmds = []
+
+    # Check uv
+    try:
+        res = subprocess.run(["uv", "tool", "list"], capture_output=True, text=True)
+        if res.returncode == 0 and "ulkan" in res.stdout:
+            method = "uv"
+            uninstall_cmds = ["uv", "tool", "uninstall", "ulkan"]
+    except FileNotFoundError:
+        pass
+
+    # Check pipx
+    if not method:
+        try:
+            res = subprocess.run(["pipx", "list"], capture_output=True, text=True)
+            if res.returncode == 0 and "package ulkan" in res.stdout:
+                method = "pipx"
+                uninstall_cmds = ["pipx", "uninstall", "ulkan"]
+        except FileNotFoundError:
+            pass
+
+    # Fallback to pip
+    if not method:
+        method = "pip"
+        uninstall_cmds = [sys.executable, "-m", "pip", "uninstall", "ulkan", "-y"]
+
+    console.print(f"[info]Detected installation method: [bold]{method}[/bold][/info]")
+
+    if dry_run:
+        print_step("Dry run: would execute")
+        console.print(f"[spring_green]{' '.join(uninstall_cmds)}[/spring_green]")
+        return
+
+    print_step("Uninstalling...")
+
+    try:
+        subprocess.run(uninstall_cmds, check=True)
+        print_success("Ulkan has been successfully uninstalled. Goodbye! 👋")
+    except subprocess.CalledProcessError as e:
+        print_error(f"Failed to uninstall Ulkan: {e}")
+        raise typer.Exit(code=1)
