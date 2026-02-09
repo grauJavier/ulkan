@@ -47,6 +47,27 @@ def list_assets(asset_type: str) -> List[str]:
     return sorted(assets)
 
 
+def search_assets(query: str) -> List[str]:
+    """Searches for assets matching the query.
+
+    Args:
+        query: Search term.
+
+    Returns:
+        List of matching assets in format 'type/name'.
+    """
+    results = []
+    for asset_type in ["skills", "workflows", "rules", "tools"]:
+        items = list_assets(asset_type)
+        for item in items:
+            if query.lower() in item.lower():
+                # Singularize type for display/add command
+                singular_type = asset_type.rstrip("s")
+                results.append(f"{singular_type}/{item}")
+
+    return sorted(results)
+
+
 def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
     """Adds an asset from the registry to the project.
 

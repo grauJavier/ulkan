@@ -265,11 +265,11 @@ def init(
 
         console.print()
         console.print(
-            "  [info]2.[/info] Run [prompt]ulkan sync[/prompt] to keep docs updated"
+            "  [info]2.[/info] Maintain clarity regularly with [prompt]/docs[/prompt] or [prompt]ulkan sync[/prompt]"
         )
         console.print()
         console.print(
-            "  [info]3.[/info] Explore [prompt].agent/skills/[/prompt] and [prompt].agent/workflows/[/prompt]"
+            f"  [bold yellow]💡 ProTip:[/bold yellow] Browse the registry with [spring_green]ulkan list all[/spring_green] or find specific assets with [spring_green]ulkan search[/spring_green]."
         )
     console.print()
 
@@ -341,6 +341,11 @@ def adapt(
         setup_opencode(root)
 
     print_success("Project adapted successfully! 🤖")
+    console.print()
+    console.print(
+        "  [bold yellow]💡 ProTip:[/bold yellow] Run [spring_green]ulkan build[/spring_green] to populate AGENTS.md."
+    )
+    console.print()
 
 
 @app.command()
@@ -404,6 +409,13 @@ def build(
 
     if not success:
         raise typer.Exit(code=1)
+
+    if success and not dry_run:
+        console.print()
+        console.print(
+            "  [bold yellow]💡 ProTip:[/bold yellow] Use [spring_green]--dry-run[/spring_green] to preview the prompt."
+        )
+        console.print()
 
 
 @app.command()
@@ -732,6 +744,40 @@ def list(
         for asset in assets:
             console.print(f"  • {asset}")
     console.print()
+    console.print(
+        f"  [bold yellow]💡 ProTip:[/bold yellow] Use [spring_green]ulkan search <query>[/spring_green] to find specific assets."
+    )
+    console.print()
+
+
+@app.command()
+def search(
+    query: str = typer.Argument(..., help="Search term to find assets."),
+) -> None:
+    """
+    Searches for assets in the registry.
+    """
+    from .manager import search_assets
+    from . import __version__
+
+    print_banner(version=__version__)
+
+    results = search_assets(query)
+
+    console.print(f"[title]Search Results for '{query}':[/title]")
+    console.print()
+
+    if not results:
+        console.print("[dim]  No assets found.[/dim]")
+    else:
+        for result in results:
+            console.print(f"  • {result}")
+
+    console.print()
+    console.print(
+        "  [bold yellow]💡 ProTip:[/bold yellow] Install any of these with [spring_green]ulkan add <type> <name>[/spring_green]."
+    )
+    console.print()
 
 
 @app.command()
@@ -778,9 +824,15 @@ def add(
         )
         if asset_type == "workflow":
             console.print(
-                f"  [info]2.[/info] [dim]ProTip: Update this workflow with specific steps:[/dim]"
+                f"  [info]2.[/info] [bold yellow]💡 ProTip:[/bold yellow] Update this workflow with specific steps:"
             )
-            console.print(f'     [dim]"/add-to-workflow {name} <instruction>"[/dim]')
+            console.print(
+                f'     [#00ffaf]"/add-to-workflow {name} <instruction>"[/#00ffaf]'
+            )
+        else:
+            console.print(
+                "  [info]2.[/info] [bold yellow]💡 ProTip:[/bold yellow] Find more assets with [spring_green]ulkan search[/spring_green] or [spring_green]ulkan list all[/spring_green]."
+            )
         console.print()
     else:
         raise typer.Exit(code=1)
@@ -805,3 +857,10 @@ def sync(
 
     if not success:
         raise typer.Exit(code=1)
+
+    if success and not check:
+        console.print()
+        console.print(
+            "  [bold yellow]💡 ProTip:[/bold yellow] Add [spring_green]ulkan sync --check[/spring_green] to your CI/CD pipeline."
+        )
+        console.print()
