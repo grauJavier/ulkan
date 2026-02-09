@@ -14,21 +14,23 @@ Ulkan operates on a "Hub and Spoke" model:
 | **Language** | Python 3.12+ | Modern, typed, compliant with latest standards. |
 | **CLI Framework** | `typer` | Type-hint based CLI creation, robust and easy to maintain. |
 | **Terminal UI** | `rich` | Beautiful, readable output is critical for developer tools. |
-| **Interactivity** | `inquirerpy` | robust interactive prompts for `init` and selection flows. |
-| **Packaging** | `hatchling` | Modern standards-based build backend. |
+| **Communication** | `httpx` | Modern, async-capable HTTP client for API interactions (PyPI, Skyll). |
+| **Versioning** | `packaging` | Robust version comparison logic (SemVer compliant). |
 
 ## 3. Project Structure
 
 ```
 src/ulkan/
 ├── main.py          # Entry point
-├── commands.py      # CLI command definitions (init, build, adapt, sync)
+├── commands.py      # CLI command definitions (init, build, adapt, sync, upgrade, etc.)
 ├── agents.py        # Logic for specific AI agent adapters
 ├── generator.py     # Scaffolding logic (creating .agent structure)
 ├── migrator.py      # Logic for ingesting existing agent configs
 ├── syncer.py        # Documentation synchronization logic
 ├── builder.py       # "AI Build" logic (LLM interaction)
-└── templates/       # Jinja2 templates for artifacts
+├── manager.py       # Asset management logic (install, list, search)
+├── updater.py       # Self-update logic (PyPI check, pip upgrade)
+└── blueprints/      # Asset registry (skills, workflows, etc.)
 ```
 
 ## 4. Core Concepts

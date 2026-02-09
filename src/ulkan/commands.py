@@ -17,7 +17,14 @@ from .agents import (
 )
 from .builder import is_cli_available, run_build
 from .generator import generate_project
-from .styles import console, print_banner, print_error, print_step, print_success
+from .styles import (
+    console,
+    print_banner,
+    print_error,
+    print_header,
+    print_step,
+    print_success,
+)
 from . import __version__
 
 # Ulkan color palette for InquirerPy (uses prompt_toolkit syntax)
@@ -138,8 +145,13 @@ def init(
     Scaffolds a new agentic project structure.
     """
     from . import __version__
+    from .updater import check_for_update
 
-    print_banner(version=__version__)
+    # Check for updates (non-blocking, fails silently)
+    _, new_version = check_for_update(__version__)
+    has_update = new_version and new_version != __version__
+
+    print_banner(version=__version__, new_version=new_version if has_update else None)
 
     target_path = path.resolve()
 
@@ -288,9 +300,8 @@ def adapt(
     """
     Adapts the project for specific AI agents (Claude, Gemini, etc.).
     """
-    from . import __version__
 
-    print_banner(version=__version__)
+    print_header(version=__version__)
     root = Path.cwd()
 
     if not (root / "AGENTS.md").exists():
@@ -374,10 +385,8 @@ def build(
     Detects which agents are adapted (via symlinks) and uses their CLI
     to analyze the project and update AGENTS.md.
     """
-    from . import __version__
 
-    print_banner(version=__version__)
-
+    print_header(version=__version__)
     target_path = path.resolve()
 
     if not (target_path / "AGENTS.md").exists():
@@ -442,7 +451,7 @@ def remove(
     from .agents import AGENT_FILE_MAP
     from .builder import get_adapted_agents
 
-    print_banner(version=__version__)
+    print_header(version=__version__)
     root = Path.cwd()
 
     # Case 1: Eject Ulkan (--self)
@@ -565,9 +574,7 @@ def autoremove(
     """
     from .builder import get_adapted_agents
 
-    from . import __version__
-
-    print_banner(version=__version__)
+    print_header(version=__version__)
     root = Path.cwd()
 
     # Find adapted agents without CLI installed
@@ -617,9 +624,7 @@ def migrate(
     from .generator import generate_project
     from .migrator import detect_sources, run_migration
 
-    from . import __version__
-
-    print_banner(version=__version__)
+    print_header(version=__version__)
     root = Path.cwd()
 
     # Check if .agent already exists
@@ -702,9 +707,8 @@ def list(
     Lists available assets in the blueprints.
     """
     from .manager import list_assets
-    from . import __version__
 
-    print_banner(version=__version__)
+    print_header(version=__version__)
 
     # Handle "all" case
     if type_arg == "all":
@@ -712,7 +716,6 @@ def list(
         for t in valid_types:
             assets = list_assets(t)
             console.print(f"[title]Available {t.capitalize()}:[/title]")
-            console.print()
             if not assets:
                 console.print("  [dim]No assets found.[/dim]")
             else:
@@ -738,8 +741,6 @@ def list(
     assets = list_assets(asset_type)
 
     console.print(f"[title]Available {asset_type.capitalize()}:[/title]")
-    console.print()
-
     if not assets:
         console.print("[dim]  No assets found.[/dim]")
     else:
@@ -763,10 +764,9 @@ def search(
     Searches for assets in the blueprints (Skyll API).
     """
     from .manager import search_assets
-    from . import __version__
     from rich.table import Table
 
-    print_banner(version=__version__)
+    print_header(version=__version__)
 
     # Validate sort option
     if sort and sort not in ["installs", "relevance"]:
@@ -825,9 +825,8 @@ def add(
     Adds an asset from the registry to your project.
     """
     from .manager import add_asset
-    from . import __version__
 
-    print_banner(version=__version__)
+    print_header(version=__version__)
     root = Path.cwd()
 
     if not (root / ".agent").exists():
@@ -884,6 +883,7 @@ def sync(
     """
     from .syncer import sync_documentation
 
+    print_header(version=__version__)
     root = Path.cwd()
     success = sync_documentation(root, check=check)
 
@@ -896,3 +896,40 @@ def sync(
             "  [bold yellow]💡 ProTip:[/bold yellow] Add [spring_green]ulkan sync --check[/spring_green] to your CI/CD pipeline."
         )
         console.print()
+
+
+@app.command()
+def upgrade() -> None:
+    """
+    Upgrades Ulkan to the latest version.
+    """
+    from .updater import check_for_update, run_upgrade
+
+    print_header(version=__version__)
+
+    print_step("Checking for updates...")
+
+    has_update, latest = check_for_update(__version__)
+
+    if not has_update:
+        if latest:
+            print_success(f"You're already on the latest version (v{__version__})!")
+        else:
+            print_error("Could not check for updates. Check your internet connection.")
+        return
+
+    console.print(f"[info]New version available: v{latest}[/info]")
+    console.print()
+
+    if not Confirm.ask(f"Upgrade from v{__version__} to v{latest}?", default=True):
+        console.print("[info]Upgrade cancelled.[/info]")
+        return
+
+    print_step("Upgrading Ulkan...")
+
+    if run_upgrade():
+        print_success(f"Successfully upgraded to v{latest}! 🚀")
+        console.print("[info]Restart your terminal to use the new version.[/info]")
+    else:
+        print_error("Upgrade failed. Try manually: pip install --upgrade ulkan")
+        raise typer.Exit(code=1)

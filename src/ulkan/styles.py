@@ -1,4 +1,3 @@
-import pyfiglet
 from rich.console import Console
 from rich.theme import Theme
 
@@ -27,23 +26,21 @@ custom_theme = Theme(
 console = Console(theme=custom_theme)
 
 
-def print_banner(version: str = None):
-    """Prints the Ulkan banner in ASCII art."""
-    # "ansi_shadow" or "doom" are good for shadow/filled look.
-    # If ansi_shadow isn't available, pyfiglet might fall back or error,
-    # but it is a standard FIGlet font.
-    try:
-        ascii_art = pyfiglet.figlet_format("ULKAN", font="ansi_shadow")
-    except pyfiglet.FontNotFound:
-        # Fallback to a safe one if ansi_shadow is missing
-        ascii_art = pyfiglet.figlet_format("ULKAN", font="doom")
-
+def print_banner(version: str = None, new_version: str = None):
+    """Prints the Ulkan banner in ASCII art with wave."""
     # Add top spacing
     console.print()
 
-    # Create a "Water/Sky" Gradient
-    # We will split the ascii art into lines and apply a vertical gradient
-    lines = ascii_art.rstrip().split("\n")
+    # Combined Wave 🌊 + ULKAN ASCII art (wave on left)
+    # Wave colors: darker chars are deep blue, lighter are cyan/white
+    banner_lines = [
+        "   ░▒▒▓▒░    ██╗   ██╗██╗     ██╗  ██╗ █████╗ ███╗   ██╗",
+        " ░▓██▓██▓░   ██║   ██║██║     ██║ ██╔╝██╔══██╗████╗  ██║",
+        "░███▓▓░ ▒░   ██║   ██║██║     █████╔╝ ███████║██╔██╗ ██║",
+        "▒█▓▓▓▒▒      ██║   ██║██║     ██╔═██╗ ██╔══██║██║╚██╗██║",
+        "░▒░▒▒▒▒▒░░   ╚██████╔╝███████╗██║  ██╗██║  ██║██║ ╚████║",
+        "░▒▒▒░▒▒░▒░   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝",
+    ]
 
     # Gradient Palette (Top to Bottom): Mist -> Sky -> Deep Spiritual Blue
     gradient_colors = [
@@ -55,8 +52,7 @@ def print_banner(version: str = None):
         "#4848d8",  # Deep Blue
     ]
 
-    for i, line in enumerate(lines):
-        # Cycle through colors if there are more lines than colors
+    for i, line in enumerate(banner_lines):
         color = gradient_colors[min(i, len(gradient_colors) - 1)]
         console.print(f"[bold {color}]{line}[/bold {color}]", justify="center")
 
@@ -65,6 +61,14 @@ def print_banner(version: str = None):
         subtitle += f" [dim cyan]- v{version}[/dim cyan]"
 
     console.print(subtitle, justify="center", highlight=False)
+
+    # Show update notification if new version available
+    if new_version:
+        console.print(
+            f"[#ffaf5f]New release available: v{new_version} → Run: ulkan upgrade[/#ffaf5f]",
+            justify="center",
+        )
+
     console.print()
 
 
@@ -81,3 +85,19 @@ def print_success(message: str):
 def print_error(message: str):
     """Prints an error message."""
     console.print(f"[error]✖[/error] {message}")
+
+
+def print_header(version: str = None, new_version: str = None):
+    """Prints a simple one-line header for non-init commands."""
+    header = "[bold #5f5fff]Ulkan[/bold #5f5fff] [white]|[/white] [dim cyan]The Agentic Scaffolding Tool[/dim cyan]"
+    if version:
+        header += f" [dim cyan]- v{version}[/dim cyan]"
+    console.print(header)
+
+    # Show update notification if new version available
+    if new_version:
+        console.print(
+            f"[#ffaf5f]New release available: v{new_version} → Run: ulkan upgrade[/#ffaf5f]"
+        )
+
+    console.print()

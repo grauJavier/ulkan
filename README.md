@@ -1,20 +1,9 @@
-# 🌊 Ulkan
+# 🌊 Ulkan | The Agentic Scaffolding Tool
 
 [![PyPI version](https://img.shields.io/pypi/v/ulkan.svg)](https://pypi.org/project/ulkan/)
 [![Python](https://img.shields.io/pypi/pyversions/ulkan.svg)](https://pypi.org/project/ulkan/)
 [![CI](https://github.com/graujavier/ulkan/actions/workflows/ci.yml/badge.svg)](https://github.com/graujavier/ulkan/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/graujavier/ulkan.svg)](LICENSE)
-
-**The Agentic Scaffolding Tool** – Bootstrap AI-agent-ready projects in seconds.
-
-```
-  ██╗   ██╗██╗     ██╗  ██╗ █████╗ ███╗   ██╗
-  ██║   ██║██║     ██║ ██╔╝██╔══██╗████╗  ██║
-  ██║   ██║██║     █████╔╝ ███████║██╔██╗ ██║
-  ██║   ██║██║     ██╔═██╗ ██╔══██║██║╚██╗██║
-  ╚██████╔╝███████╗██║  ██╗██║  ██║██║ ╚████║
-   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
-```
 
 ## ✨ What is Ulkan?
 
@@ -103,6 +92,14 @@ Uses the adapted agent's CLI to analyze your project and update AGENTS.md:
 - Detects which agent is adapted (via symlinks)
 - Runs the corresponding CLI with a documentation prompt
 - Updates project context, architecture, and tech stack
+
+### Update Ulkan
+
+```bash
+ulkan upgrade
+```
+
+Checks for the latest version on PyPI and upgrades if available. Ulkan also automatically notifies you of new versions in the CLI banner.
 
 ### Remove Adapters
 

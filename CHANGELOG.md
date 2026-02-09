@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyPI publishing uses **Trusted Publishers** (OIDC) for secure, tokenless releases.
 
 ### Added
+- `ulkan upgrade` command to update Ulkan to the latest version.
+- Update notification in banner/header when a new release is available.
 - `--gitignore` flag to `ulkan init` to automatically add `.agent/` and `AGENTS.md` to `.gitignore`.
 - `ulkan search <query>` command now queries the Skyll API for agent skills (supports `--sort installs`).
 - `ulkan add skill <name>` prioritizes Skyll API and generates YAML frontmatter (`name`, `description`, `trigger`, etc.) instead of `metadata.json`.
