@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2026-02-09
 
 ### Changed
 - CI now uses **Black** for formatting instead of Ruff.
 - Renamed `release.yml` → `publish.yml` workflow.
 - PyPI publishing uses **Trusted Publishers** (OIDC) for secure, tokenless releases.
+- Replaced `astral-sh/setup-uv` with `pip install uv` in CI/Release workflows for reliability.
 
 ### Added
 - `ulkan upgrade` command to update Ulkan to the latest version.
@@ -60,5 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `lint_agent_setup.py`
 - Single source of truth architecture via symlinks
 
-[Unreleased]: https://github.com/graujavier/ulkan/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/graujavier/ulkan/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/graujavier/ulkan/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/graujavier/ulkan/releases/tag/v0.1.0
