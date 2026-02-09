@@ -64,40 +64,54 @@ detect_os() {
 
 # Install ulkan using the best available method
 install_ulkan() {
+    local REPO_URL="git+https://github.com/graujavier/ulkan.git"
+
     # Try uv first (fastest)
     if command_exists uv; then
-        info "Installing ulkan with uv..."
-        uv tool install ulkan
+        info "Installing ulkan with uv from GitHub..."
+        # --force ensures we reinstall/upgrade if it exists
+        uv tool install --force "$REPO_URL"
         success "Installed ulkan with uv!"
         return 0
     fi
 
     # Try pipx (isolated environments)
     if command_exists pipx; then
-        info "Installing ulkan with pipx..."
-        pipx install ulkan
+        info "Installing ulkan with pipx from GitHub..."
+        # --force ensures we reinstall/upgrade if it exists
+        pipx install --force "$REPO_URL"
         success "Installed ulkan with pipx!"
         return 0
     fi
 
     # Fallback to pip with --user
     if command_exists pip3; then
-        info "Installing ulkan with pip3..."
-        pip3 install --user ulkan
+        info "Installing ulkan with pip3 from GitHub..."
+        pip3 install --upgrade --user "$REPO_URL"
         success "Installed ulkan with pip3!"
         warn "Consider installing pipx for better isolation: https://pipx.pypa.io/"
+        check_path_for_pip
         return 0
     fi
 
     if command_exists pip; then
-        info "Installing ulkan with pip..."
-        pip install --user ulkan
+        info "Installing ulkan with pip from GitHub..."
+        pip install --upgrade --user "$REPO_URL"
         success "Installed ulkan with pip!"
         warn "Consider installing pipx for better isolation: https://pipx.pypa.io/"
+        check_path_for_pip
         return 0
     fi
 
     return 1
+}
+
+check_path_for_pip() {
+    # Simple check if ~/.local/bin matches PATH
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        warn "It seems $HOME/.local/bin is NOT in your PATH."
+        warn "You may need to add it to run 'ulkan'."
+    fi
 }
 
 # Main installation flow

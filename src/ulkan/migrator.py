@@ -86,7 +86,7 @@ def copy_folder_contents(src: Path, dest: Path) -> int:
                 count += sum(1 for _ in item.rglob("*") if _.is_file())
         else:
             if dest_item.exists():
-                # Skip if destination exists (don't overwrite Ulkan templates)
+                # Skip if destination exists (don't overwrite Ulkan blueprints)
                 console.print(f"[warning]  ⊘ Skipped (exists): {item.name}[/warning]")
             else:
                 shutil.copy2(item, dest_item)

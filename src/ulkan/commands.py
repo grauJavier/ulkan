@@ -271,7 +271,7 @@ def init(
         )
         console.print()
         console.print(
-            f"  [bold yellow]💡 ProTip:[/bold yellow] Browse the registry with [spring_green]ulkan list all[/spring_green] or find specific assets with [spring_green]ulkan search[/spring_green]."
+            f"  [bold yellow]💡 ProTip:[/bold yellow] Browse the blueprints with [spring_green]ulkan list all[/spring_green] or find specific assets with [spring_green]ulkan search[/spring_green]."
         )
     console.print()
 
@@ -699,7 +699,7 @@ def list(
     ),
 ) -> None:
     """
-    Lists available assets in the registry.
+    Lists available assets in the blueprints.
     """
     from .manager import list_assets
     from . import __version__
@@ -760,7 +760,7 @@ def search(
     ),
 ) -> None:
     """
-    Searches for assets in the registry (Skyll API).
+    Searches for assets in the blueprints (Skyll API).
     """
     from .manager import search_assets
     from . import __version__

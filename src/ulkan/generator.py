@@ -5,9 +5,8 @@ from importlib import resources
 from .styles import console
 
 # Define paths to resources
-# Assuming they are packaged in src/ulkan/templates and src/ulkan/registry
-TEMPLATES_PKG = "ulkan.templates"
-REGISTRY_PKG = "ulkan.registry"
+# Assuming they are packaged in src/ulkan/blueprints
+BLUEPRINTS_PKG = "ulkan.blueprints"
 
 
 def create_directory(path: Path) -> None:
@@ -62,10 +61,8 @@ def get_package_path(package_name: str) -> Path:
     """Get the absolute filesystem path of a package."""
     # Simple relative path resolution for now
     current_dir = Path(__file__).parent
-    if package_name == "ulkan.templates":
-        return current_dir / "templates"
-    elif package_name == "ulkan.registry":
-        return current_dir / "registry"
+    if package_name == "ulkan.blueprints":
+        return current_dir / "blueprints"
     return current_dir
 
 
@@ -113,29 +110,26 @@ def generate_project(base_path: Path) -> None:
         base_path: The root directory where the project will be initialized.
     """
 
-    templates_root = get_package_path(TEMPLATES_PKG)
-    registry_root = get_package_path(REGISTRY_PKG)
+    blueprints_root = get_package_path(BLUEPRINTS_PKG)
 
-    if not templates_root.exists():
+    if not blueprints_root.exists():
         console.print(
-            f"[error]Templates directory not found at {templates_root}[/error]"
+            f"[error]Blueprints directory not found at {blueprints_root}[/error]"
         )
         return
 
-    if not registry_root.exists():
-        console.print(f"[error]Registry directory not found at {registry_root}[/error]")
-        return
-
     # 1. Root Manifest (AGENTS.md)
-    copy_resource_file(templates_root / "AGENTS.md", base_path / "AGENTS.md", base_path)
+    copy_resource_file(
+        blueprints_root / "AGENTS.md", base_path / "AGENTS.md", base_path
+    )
 
     # 2. Core Directories & Scaffolding (READMEs and Manual)
-    # We mirror the structure of templates/ into .agent/
-    # templates/docs/ULKAN_MANUAL.md -> .agent/docs/ULKAN_MANUAL.md
+    # We mirror the structure of blueprints/ into .agent/
+    # blueprints/docs/ULKAN_MANUAL.md -> .agent/docs/ULKAN_MANUAL.md
 
     agent_dir = base_path / ".agent"
 
-    # Define mapping of template file (relative to templates root) -> destination (relative to .agent root)
+    # Define mapping of template file (relative to blueprints root) -> destination (relative to .agent root)
     scaffolding_files = {
         "docs/ULKAN_MANUAL.md": "docs/ULKAN_MANUAL.md",
         "skills/README.md": "skills/README.md",
@@ -150,10 +144,10 @@ def generate_project(base_path: Path) -> None:
     }
 
     for src_rel, dest_rel in scaffolding_files.items():
-        copy_resource_file(templates_root / src_rel, agent_dir / dest_rel, base_path)
+        copy_resource_file(blueprints_root / src_rel, agent_dir / dest_rel, base_path)
 
     # 3. Registry Components (Skills)
-    # Mapping: Skill Name -> Source Folder (relative to registry/skills)
+    # Mapping: Skill Name -> Source Folder (relative to blueprints/skills)
     skills_to_install = [
         "skill-creator",
         "rules-creator",
@@ -166,7 +160,7 @@ def generate_project(base_path: Path) -> None:
     ]
 
     for skill in skills_to_install:
-        src_skill_dir = registry_root / "skills" / skill
+        src_skill_dir = blueprints_root / "skills" / skill
         dest_skill_dir = agent_dir / "skills" / skill
 
         # Recursively copy the skill folder
@@ -178,7 +172,7 @@ def generate_project(base_path: Path) -> None:
                     dest_file = dest_skill_dir / rel_path
                     copy_resource_file(src_file, dest_file, base_path)
         else:
-            console.print(f"[error]Skill {skill} not found in registry.[/error]")
+            console.print(f"[error]Skill {skill} not found in blueprints.[/error]")
 
     # 4. Registry Components (Workflows)
     workflows_to_install = {
@@ -193,7 +187,7 @@ def generate_project(base_path: Path) -> None:
 
     for src_file, dest_file in workflows_to_install.items():
         copy_resource_file(
-            registry_root / "workflows" / src_file,
+            blueprints_root / "workflows" / src_file,
             agent_dir / "workflows" / dest_file,
             base_path,
         )
@@ -203,7 +197,7 @@ def generate_project(base_path: Path) -> None:
 
     for script in scripts_to_install:
         copy_resource_file(
-            registry_root / "tools" / "scripts" / script,
+            blueprints_root / "tools" / "scripts" / script,
             agent_dir / "tools" / "scripts" / script,
             base_path,
         )

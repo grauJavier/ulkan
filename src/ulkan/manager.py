@@ -5,11 +5,11 @@ from typing import List
 from .generator import get_package_path, copy_resource_file
 from .styles import console
 
-REGISTRY_PKG = "ulkan.registry"
+BLUEPRINTS_PKG = "ulkan.blueprints"
 
 
 def list_assets(asset_type: str) -> List[str]:
-    """Lists available assets of a given type from the registry.
+    """Lists available assets of a given type from the blueprints.
 
     Args:
         asset_type: One of 'skills', 'workflows', 'rules', 'tools'.
@@ -17,8 +17,8 @@ def list_assets(asset_type: str) -> List[str]:
     Returns:
         List of asset names.
     """
-    registry_root = get_package_path(REGISTRY_PKG)
-    asset_dir = registry_root / asset_type
+    blueprints_root = get_package_path(BLUEPRINTS_PKG)
+    asset_dir = blueprints_root / asset_type
 
     if not asset_dir.exists():
         return []
@@ -249,7 +249,7 @@ allowed-tools: *
 
 
 def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
-    """Adds an asset from the registry to the project.
+    """Adds an asset from the blueprints to the project.
 
     Args:
         asset_type: One of 'skill', 'workflow', 'rule', 'tool'. (Singular)
@@ -259,7 +259,7 @@ def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
     Returns:
         True if successful.
     """
-    registry_root = get_package_path(REGISTRY_PKG)
+    blueprints_root = get_package_path(BLUEPRINTS_PKG)
     agent_dir = base_path / ".agent"
 
     # Map singular command arg to plural folder name
@@ -275,7 +275,7 @@ def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
         return False
 
     folder_name = type_map[asset_type]
-    src_root = registry_root / folder_name
+    src_root = blueprints_root / folder_name
     dest_root = agent_dir / folder_name
 
     # PRIORITY: Check API for skills first (or if local fails? User said "Always search in Skyll")
@@ -293,7 +293,7 @@ def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
         dest_path = dest_root / name
 
         if not src_path.exists():
-            console.print(f"[error]Skill '{name}' not found in registry.[/error]")
+            console.print(f"[error]Skill '{name}' not found in blueprints.[/error]")
             return False
 
         # recursive copy
@@ -311,7 +311,7 @@ def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
 
         if not src_path.exists():
             console.print(
-                f"[error]{asset_type.capitalize()} '{name}' not found in registry.[/error]"
+                f"[error]{asset_type.capitalize()} '{name}' not found in blueprints.[/error]"
             )
             return False
 
@@ -330,7 +330,7 @@ def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
         dest_path = dest_root / name
 
         if not src_path.exists():
-            console.print(f"[error]Tool '{name}' not found in registry.[/error]")
+            console.print(f"[error]Tool '{name}' not found in blueprints.[/error]")
             return False
 
         if src_path.is_dir():
