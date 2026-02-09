@@ -24,6 +24,7 @@ Use the `ulkan` CLI to maintain the project and your own context.
 | **`ulkan add`** | `ulkan add <type> <name>` | Install an asset from the registry. |
 | **`ulkan sync`** | `ulkan sync` | **ALWAYS** run this after modifying assets to update `AGENTS.md`. |
 | **`ulkan upgrade`** | `ulkan upgrade` | Check for and install the latest version of Ulkan. |
+| **`ulkan uninstall`** | `ulkan uninstall` | Uninstall Ulkan from the system (supports `--dry-run`). |
 | **`ulkan adapt`** | `ulkan adapt --[agent]` | Restore configuration for a specific agent. |
 
 ### 🧠 Core Skills
@@ -31,14 +32,14 @@ Use these skills to perform specialized tasks. **Check `.agent/skills/` for the 
 
 | Skill | Trigger | Description |
 | :--- | :--- | :--- |
-| `adr-creator` | "Record decision" | Creates updated Architecture Decision Records (ADRs).   Trigger: When user asks to document a dec... |
-| `guidelines-creator` | "Define standard" | Creates strict guidelines or best practices documentation.   Trigger: When user asks to document ... |
-| `product-docs-creator` | "Vision/Architecture" | Creates key product documentation (Vision, Architecture) using standard templates.   Trigger: Whe... |
-| `rules-creator` | "Add a rule" | Creates new AI agent rules to enforce system constraints.   Trigger: When user asks to define a n... |
-| `skill-creator` | "Create/Add a skill" | Creates new AI agent skills following the Agent Skills spec.   Trigger: When user asks to create ... |
-| `specs-creator` | "New feature spec" | Creates new technical specifications and feature requirement documents.   Trigger: When user asks... |
-| `tools-creator` | "Create a tool/script" | Creates new AI agent tools (scripts, MCP servers, or utilities).   Trigger: When user asks to cre... |
-| `workflows-creator` | "Create a workflow" | Creates repeatable workflow documentation.   Trigger: When user asks to define a new process, pro... |
+| `adr-creator` | \"Record decision\" | Creates updated Architecture Decision Records (ADRs).   Trigger: When user asks to document a dec... |
+| `guidelines-creator` | \"Define standard\" | Creates strict guidelines or best practices documentation.   Trigger: When user asks to document ... |
+| `product-docs-creator` | \"Vision/Architecture\" | Creates key product documentation (Vision, Architecture) using standard templates.   Trigger: Whe... |
+| `rules-creator` | \"Add a rule\" | Creates new AI agent rules to enforce system constraints.   Trigger: When user asks to define a n... |
+| `skill-creator` | \"Create/Add a skill\" | Creates new AI agent skills following the Agent Skills spec.   Trigger: When user asks to create ... |
+| `specs-creator` | \"New feature spec\" | Creates new technical specifications and feature requirement documents.   Trigger: When user asks... |
+| `tools-creator` | \"Create a tool/script\" | Creates new AI agent tools (scripts, MCP servers, or utilities).   Trigger: When user asks to cre... |
+| `workflows-creator` | \"Create a workflow\" | Creates repeatable workflow documentation.   Trigger: When user asks to define a new process, pro... |
 
 ### 🛡️ Active Rules
 Always-on constraints that must be followed. **Check `.agent/rules/` for details.**
@@ -60,14 +61,15 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 
 | Workflow | Trigger | Goal |
 | :--- | :--- | :--- |
-| `/add-to-workflow` | "/add-to-workflow {workflow-names} {instruction}" | Intelligently integrates a new instruction or policy into an existing workflow. |
-| `/build` | "New app/From scratch" | Guide for new product definition (Discovery -> Vision -> Architecture) |
-| `/docs` | "Check docs" | Maintenance workflow to ensure docs consistency |
-| `/feat` | "New feature" | Guide for new features (Spec -> Plan -> Code -> Docs) |
-| `/fix` | "Fix bug" | Protocol for bug fixes (Reproduction -> Fix -> Docs) |
-| `/git-flow` | "Manage branches / Git flow" | Custom Gitflow workflow (Feature -> Dev -> Release -> Main) |
-| `/migrate` | "Migrate project" | Migrate existing agent configs to Ulkan structure |
-| `/refact` | "Code smell/Technical Debt" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
+| `/add-to-workflow` | \"/add-to-workflow {workflow-names} {instruction}\" | Intelligently integrates a new instruction or policy into an existing workflow. |
+| `/build` | \"New app/From scratch\" | Guide for new product definition (Discovery -> Vision -> Architecture) |
+| `/docs` | \"Check docs\" | Maintenance workflow to ensure docs consistency |
+| `/feat` | \"New feature\" | Guide for new features (Spec -> Plan -> Code -> Docs) |
+| `/fix` | \"Fix bug\" | Protocol for bug fixes (Reproduction -> Fix -> Docs) |
+| `/git-flow` | \"Manage branches / Git flow\" | Custom Gitflow workflow (Feature -> Dev -> Release -> Main) |
+| `/migrate` | \"Migrate project\" | Migrate existing agent configs to Ulkan structure |
+| `/refact` | \"Code smell/Technical Debt\" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
+| `/release` | \"Make a release, Release vX.Y.Z, Deploy stable\" | Guide for creating stable GitHub releases (Tag -> Changelog -> Release) |
 
 ---
 
