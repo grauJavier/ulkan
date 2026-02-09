@@ -61,18 +61,8 @@ packages = ["src/ulkan"]
 strict = true
 ignore_missing_imports = true
 
-[tool.ruff]
-line-length = 88
-target-version = "py312"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
-
-[tool.ruff.lint.per-file-ignores]
-# Template files contain long markdown strings - ignore line length
-"src/ulkan/templates/*.py" = ["E501"]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.4.0",
+    "black>=24.4.2",
 ]

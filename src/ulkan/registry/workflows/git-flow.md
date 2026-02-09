@@ -21,7 +21,7 @@ Follow Conventional Commits:
 - **`feat`**: New feature (e.g., `feat(ui): add dark mode`)
 - **`fix`**: Bug fix (e.g., `fix(auth): handle token expiry`)
 - **`docs`**: Documentation only (e.g., `docs(readme): update install steps`)
-- **`style`**: Formatting, missing semi-colons, etc; no code change (e.g., `style(lint): fix ruff errors`)
+- **`style`**: Formatting, missing semi-colons, etc; no code change (e.g., `style(lint): fix style errors`)
 - **`refactor`**: Refactoring production code, eg. renaming a variable (e.g., `refactor(api): simplify user lookup`)
 - **`test`**: Adding missing tests, refactoring tests; no production code change (e.g., `test(auth): add login unit tests`)
 - **`chore`**: Updating build tasks, package manager configs, etc; no production code change (e.g., `chore(deps): bump ulkan version`)

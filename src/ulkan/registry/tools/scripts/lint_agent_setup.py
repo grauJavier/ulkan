@@ -3,6 +3,7 @@
 The Doctor 🩺
 Validates the integrity of the .agent configuration.
 """
+
 import os
 import sys
 import glob

@@ -54,7 +54,7 @@ Use these workflows to orchestrate complex processes. **Trigger with `/workflow-
 | `/fix` | \"Fix bug\" | Protocol for bug fixes (Reproduction -> Fix -> Docs) |
 | `/git-flow` | \"Manage branches / Git flow\" | Custom Gitflow workflow (Feature -> Dev -> Release -> Main) |
 | `/migrate` | \"Migrate project\" | Migrate existing agent configs to Ulkan structure |
-| `/refact` | \"See file\" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
+| `/refact` | \"Code smell/Technical Debt\" | Workflow for code refactoring (Test Baseline -> Refactor -> Verify) |
 
 ---
 

@@ -30,5 +30,5 @@ Use when resolving a reported bug or issue.
 
 6.  **Definition of Done**
     *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]` with the prefix `Fix:`.
-    *   **Linting**: Run `uv run ruff check` and `uv run black .`.
+    *   **Linting**: Run `uv run black .`.
     *   **Tests**: Affirm that the regression test passes and no other tests are broken.

@@ -2,6 +2,7 @@
 """
 Syncs AGENTS.md with current skills, rules, workflows, and tools.
 """
+
 import os
 import re
 import glob

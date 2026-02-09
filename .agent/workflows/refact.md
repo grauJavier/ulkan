@@ -35,7 +35,7 @@ Use when improving code structure, readability, or performance WITHOUT changing 
     *   Did we introduce a new pattern? -> Update `.agent/docs/guidelines/`.
 
 7.  **Definition of Done**
-    *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure code style.
+    *   **Linting**: Run `uv run black .` to ensure code style.
     *   **Tests**: Verify all tests pass (GREEN).
     *   **CHANGELOG**: (Optional) If the refactor is significant, note it in `CHANGELOG.md` under `Changed`.
     *   **Docs**: Run the `/docs` workflow to lint and sync documentation.

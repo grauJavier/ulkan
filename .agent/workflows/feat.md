@@ -37,6 +37,6 @@ Use when starting a new feature or significant enhancement.
 
 7.  **Definition of Done**
     *   **CHANGELOG**: Add a new entry to `CHANGELOG.md` under `[Unreleased]`.
-    *   **Linting**: Run `uv run ruff check` and `uv run black .` to ensure code style.
+    *   **Linting**: Run `uv run black .` to ensure code style.
     *   **Tests**: Verify all tests pass.
     *   **Merge**: Follow the merge strategy defined in `/git-flow`.
