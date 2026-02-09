@@ -56,9 +56,8 @@ jobs:
       - name: Test init command
         run: |
           mkdir -p /tmp/test-project
-          cd /tmp/test-project
-          uv run --directory ${{ github.workspace }} ulkan init -y
-          test -f AGENTS.md
-          test -d .agent
-          test -d .agent/skills
-          test -d .agent/workflows
+          uv run --directory ${{ github.workspace }} ulkan init -y /tmp/test-project
+          test -f /tmp/test-project/AGENTS.md
+          test -d /tmp/test-project/.agent
+          test -d /tmp/test-project/.agent/skills
+          test -d /tmp/test-project/.agent/workflows
