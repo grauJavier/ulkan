@@ -18,6 +18,7 @@ from .agents import (
 from .builder import is_cli_available, run_build
 from .generator import generate_project
 from .styles import console, print_banner, print_error, print_step, print_success
+from . import __version__
 
 # Ulkan color palette for InquirerPy (uses prompt_toolkit syntax)
 ULKAN_STYLE = get_style(
@@ -91,7 +92,8 @@ def _prompt_for_agents() -> list[str]:
 
 
 app = typer.Typer(
-    help="[bold #5f5fff]Ulkan[/bold #5f5fff] [white]|[/white] [dim cyan]The Agentic Scaffolding Tool[/dim cyan]",
+    help=f"[bold #5f5fff]Ulkan[/bold #5f5fff] [white]|[/white] [dim cyan]The Agentic Scaffolding Tool - v{__version__}[/dim cyan]",
+    epilog="[bold yellow]💡 ProTip:[/bold yellow] Use [spring_green]ulkan [COMMAND] --help[/spring_green] for more information on a command.",
     no_args_is_help=True,
     rich_markup_mode="rich",
 )
