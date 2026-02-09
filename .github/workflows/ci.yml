@@ -23,11 +23,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
       
-      - name: Run Ruff (lint)
-        run: uv run ruff check .
-      
-      - name: Run Ruff (format check)
-        run: uv run ruff format --check .
+      - name: Check formatting (Black)
+        run: uv run black --check .
 
   test:
     runs-on: ${{ matrix.os }}

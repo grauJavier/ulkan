@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
+### Changed
+- CI now uses **Black** for formatting instead of Ruff.
+- Renamed `release.yml` → `publish.yml` workflow.
+- PyPI publishing uses **Trusted Publishers** (OIDC) for secure, tokenless releases.
 
 ### Added
 - `--gitignore` flag to `ulkan init` to automatically add `.agent/` and `AGENTS.md` to `.gitignore`.
