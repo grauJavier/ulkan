@@ -116,6 +116,111 @@ def search_assets(query: str, limit: int = 50, sort_by: str = None) -> List[dict
         return []
 
 
+def install_skill_from_api(name: str, base_path: Path) -> bool:
+    """Installs a skill from the Skyll API.
+
+    Args:
+        name: Name of the skill to install.
+        base_path: Project root.
+
+    Returns:
+        True if successful.
+    """
+    console.print(f"[info]Searching Skyll API for skill '{name}'...[/info]")
+
+    # Search for the skill
+    results = search_assets(name, limit=1)
+
+    if not results:
+        return False
+
+    skill_data = results[0]
+
+    # Verify if it's a reasonable match?
+    # For now, we trust the top result if the user is asking for it.
+    # But we might want to warn if the name is very different.
+    api_title = skill_data["name"]
+    console.print(f"[info]Found: {api_title}[/info]")
+
+    # We need the full content. The search result MIGHT have it in 'content',
+    # but let's be sure. The search_assets implementation extracts 'content'.
+    # However, 'search_assets' returns a simplified dict.
+    # 'search_assets' currently truncates description.
+    # We need to fetch the FULL content.
+    # The 'search' endpoint returns full content in 'content' field as per user check.
+    # BUT my 'search_assets' function returns a constructed dict with truncated description.
+    # I should modify 'search_assets' OR make a direct call here to get the raw data.
+    # Making a direct call here is safer to get the full content without altering search_assets signature too much.
+
+    try:
+        response = httpx.get(
+            SKYLL_API_URL, params={"q": name, "limit": 1}, timeout=10.0
+        )
+        response.raise_for_status()
+        data = response.json()
+        skills = data.get("skills", [])
+        if not skills and "payload" in data:
+            skills = data["payload"].get("skills", [])
+
+        if not skills:
+            return False
+
+        target_skill = skills[0]
+        content = target_skill.get("content", "")
+
+        if not content:
+            console.print("[error]Skill content is empty![/error]")
+            return False
+
+        # Install logic
+        agent_dir = base_path / ".agent"
+        skills_dir = agent_dir / "skills"
+
+        # Use the requested name for the folder to match user expectation/args
+        # sanitize name just in case?
+        safe_name = name.replace(" ", "-").replace("/", "-").lower()
+        target_dir = skills_dir / safe_name
+
+        if target_dir.exists():
+            console.print(
+                f"[warning]Skill '{safe_name}' already exists. Overwriting...[/warning]"
+            )
+        else:
+            target_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write SKILL.md
+        skill_file = target_dir / "SKILL.md"
+        skill_file.write_text(content, encoding="utf-8")
+
+        # Write metadata (optional but good)
+        metadata = target_skill.get("metadata", {})
+        # Merge with our own metadata
+        metadata.update(
+            {
+                "source": "skyll",
+                "original_title": target_skill.get("title"),
+                "install_count": target_skill.get("install_count"),
+                "relevance_score": target_skill.get("relevance_score"),
+                "id": target_skill.get("id"),
+            }
+        )
+
+        import json
+
+        (target_dir / "metadata.json").write_text(
+            json.dumps(metadata, indent=2), encoding="utf-8"
+        )
+
+        console.print(
+            f"[success]Installed skill '{safe_name}' from Skyll API![/success]"
+        )
+        return True
+
+    except Exception as e:
+        console.print(f"[error]Failed to install from API: {e}[/error]")
+        return False
+
+
 def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
     """Adds an asset from the registry to the project.
 
@@ -145,6 +250,16 @@ def add_asset(asset_type: str, name: str, base_path: Path) -> bool:
     folder_name = type_map[asset_type]
     src_root = registry_root / folder_name
     dest_root = agent_dir / folder_name
+
+    # PRIORITY: Check API for skills first (or if local fails? User said "Always search in Skyll")
+    # Implication: Try API first. If found, good. If not, try local.
+    if asset_type == "skill":
+        if install_skill_from_api(name, base_path):
+            return True
+        # If API failed or yielded no results, fall through to local check
+        console.print(
+            "[info]Skill not found in API or API failed. Checking local registry...[/info]"
+        )
 
     if asset_type == "skill":
         src_path = src_root / name
