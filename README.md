@@ -22,24 +22,19 @@ Ulkan creates a standardized `.agent/` architecture that any AI coding assistant
 
 ## 🚀 Quick Install
 
-**With curl (recommended):**
+**With pip (standard):**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/graujavier/ulkan/main/scripts/install.sh | bash
+pip install ulkan
 ```
 
-**With pipx:**
+**With pipx (isolated - recommended):**
 ```bash
 pipx install ulkan
 ```
 
-**With uv:**
+**With uv (fastest):**
 ```bash
 uv tool install ulkan
-```
-
-**With pip:**
-```bash
-pip install ulkan
 ```
 
 ## 📦 Usage

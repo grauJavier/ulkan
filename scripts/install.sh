@@ -3,8 +3,11 @@
 # 🌊 Ulkan Installer
 # The Agentic Scaffolding Tool
 # 
-# Usage:
-#   curl -fsSL https://raw.githubusercontent.com/graujavier/ulkan/main/scripts/install.sh | bash
+# Usage (when repo is public):
+#   curl -fsSL https://raw.githubusercontent.com/grauJavier/ulkan/main/scripts/install.sh | bash
+#
+# Alternative (always works):
+#   pip install ulkan
 # =============================================================================
 
 set -e
