@@ -13,6 +13,9 @@ You have access to the `ulkan` CLI. Use it to maintain the project and your own 
 
 | Command | Usage | When to use |
 | :--- | :--- | :--- |
+| **`ulkan search`** | `ulkan search <query>` | Search the **Skyll API** for Skills, Workflows, or Tools to add to your project. Supports sorting (`--sort installs`). |
+| **`ulkan list`** | `ulkan list <type>` | View what assets are currently installed in your `.agent/` directory. Use `ulkan list all` to see everything. |
+| **`ulkan add`** | `ulkan add <type> <name>` | Install an asset from the registry (API or local). E.g., `ulkan add skill react-best-practices`. |
 | **`ulkan sync`** | `ulkan sync` | **ALWAYS** after creating or modifying a Skill, Rule, or Workflow. This updates `AGENTS.md` automatically. |
 | **`ulkan build`** | `ulkan build` | When you need to re-analyze the project context and update the "Tech Stack" section of `AGENTS.md`. |
 | **`ulkan adapt`** | `ulkan adapt --[agent]` | If you lose your configuration files. Restores symlinks for specific agents (e.g., `ulkan adapt --claude`). |
